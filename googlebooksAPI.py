@@ -38,10 +38,8 @@ def retrieveBook(isbn, type):
     
     # Returns book's average rating
     elif type == "averageRating":
-        averateRating = "Average Rating: {}".format(rating)
-        return averateRating
+        return rating
     
     # Returns number of ratings for the book
     elif type == "numberOfRating":
-        numberOfRating = "Number of Ratings: {}".format(reviewCount)
-        return numberOfRating
+        return reviewCount

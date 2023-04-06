@@ -156,11 +156,6 @@ def view():
         reviews = db.execute(text("SELECT * FROM reviews WHERE isbn = :isbn"),
             {"isbn": isbn}).fetchall()
 
-        # Reformatting some of the strings
-        title = f"Title: {title}"
-        author = f"Author: {author}"
-        year = f"Year: {year}" 
-
         return render_template("book.html", isbn=isbn, title=title, author=author, year=year, averageRating=averageRating, numberOfRating=numberOfRating, reviews=reviews)
 
 # Submits user's book review
