@@ -1,7 +1,15 @@
 {% extends "base.html" %}
 
 {% block head %}
-<title>Success</title>
+<title>
+  {% if error %}
+  Error
+  {% endif %}
+
+  {% if success %}
+  Success
+  {% endif %}
+</title>
 
 {% endblock %}
 
@@ -12,7 +20,19 @@
     <button class="logoutSignInButton">LOGOUT</button>
   </form>
 
-  <h1>Success</h1>
+  <h1>
+    {% if error %}
+    Error
+    {% endif %}
+
+    {% if success %}
+    Success
+    {% endif %}
+  </h1>
+
+  {% if error %}
+  <p style="color:rgb(226, 223, 223);">{{ error | safe }}</p>
+  {% endif %}
 
   {% if success %}
     <p class="success" style="color:rgb(226, 223, 223);">{{ success | safe }}</p>

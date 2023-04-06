@@ -6,7 +6,7 @@ from sqlalchemy.sql import text
 from sqlalchemy import create_engine
 
 app = Flask(__name__)
-app.secret_key = '_23hd9udhf*HUHDF'
+app.secret_key = 'verySecretKey'
 
 # Configures session to use filesystem
 app.config["SESSION_PERMANENT"] = False
@@ -171,7 +171,7 @@ def review():
         existingReviewCheck = db.execute(text("SELECT review FROM reviews WHERE id = :id AND isbn = :isbn"),
             {"id": id, "isbn": isbn}).fetchone()
         if existingReviewCheck:
-            return render_template("error.html", error="Unable to submit review. You have already completed a review for this book.")
+            return render_template("message.html", error="Unable to submit review. You have already completed a review for this book.")
         
         # Creating new review
         else:
@@ -179,7 +179,7 @@ def review():
                 {"id": id, "isbn": isbn, "rating": rating, "review": review}) 
             db.commit()
 
-            return render_template("success.html", success="Your review has been successfully submitted!")
+            return render_template("message.html", success="Your review has been successfully submitted!")
 
 # Redirects user to a new page containing book information pulled from Google Books API
 @app.route("/api/<isbn>")
