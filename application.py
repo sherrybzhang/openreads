@@ -39,13 +39,13 @@ def register():
 
         # User did not provide a username and/or password
         if username == "" or password == "":
-            return render_template("index.html", message="* Please enter required fields.")
+            return render_template("index.html", message="* Please enter required fields")
         
         # Username already exists in database
         userDB = db.execute(text("SELECT * FROM users WHERE username = :username"), 
             {"username": username}).fetchone()
         if userDB:
-            return render_template("index.html", message="* Username is already taken. Please select a different one.")
+            return render_template("index.html", message="* Username is already taken. Please select a different one")
         
         # Creating new account for the user
         db.execute(text("INSERT INTO users (username, password) VALUES (:username, :password)"), 
@@ -69,7 +69,7 @@ def login():
 
         # Username and/or password is missing
         if username == "" or password == "":
-            render_template("login.html", message = "* Username and/or password is incorrect.")
+            render_template("login.html", message = "* Username and/or password is incorrect")
         
         # Checks if username/password exists in database and if it matches the user's inputs
         userInfo = db.execute(text("SELECT * FROM users WHERE username = :username AND password = :password"), 
@@ -81,7 +81,7 @@ def login():
         if userInfo:
             return render_template("search.html")
         
-        return render_template("login.html", message = "* Username and/or password is incorrect.")
+        return render_template("login.html", message = "* Username and/or password is incorrect")
 
 # Logs user out and ends session
 @app.route("/logout", methods=["POST"])
@@ -105,7 +105,7 @@ def search():
             if books: 
                 return render_template("search.html", books=books)
             else:
-                return render_template("search.html", message="*No matches were found.")
+                return render_template("search.html", message="* No matches were found")
         
         # Search by Book Title
         elif title and isbn == "" and author == "":
@@ -114,7 +114,7 @@ def search():
             if books: 
                 return render_template("search.html", books=books)
             else:
-                return render_template("search.html", message="*No matches were found.")
+                return render_template("search.html", message="* No matches were found")
         
         # Search by Author
         elif author and isbn == "" and title == "":
@@ -123,7 +123,7 @@ def search():
             if books: 
                 return render_template("search.html", books=books)
             else:
-                return render_template("search.html", message="*No matches were found.")
+                return render_template("search.html", message="* No matches were found")
             
         else:
             return render_template("search.html", message="* Please fill out at most one field below")
@@ -142,7 +142,7 @@ def view():
         try:
             isbn = request.form["book"]
         except KeyError:
-            return render_template("search.html", message="* Please enter a book ISBN, title, or author first.")
+            return render_template("search.html", message="* Please enter a book ISBN, title, or author first")
         
         # Selecting desired information from 'books' table in database
         title = db.execute(text("SELECT title FROM books WHERE isbn = :isbn"),
