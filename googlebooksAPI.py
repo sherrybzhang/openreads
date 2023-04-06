@@ -21,7 +21,7 @@ def retrieveBook(isbn, type):
         reviewCount = volumeInfo["ratingsCount"]
     except KeyError:
         rating = "Unavailable"
-        reviewCount = 0
+        reviewCount = "0"
     
     # Returns complete book information as JSON object
     if type == "json":
