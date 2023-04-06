@@ -40,15 +40,13 @@ Nittany Reads—a book review platform—is a simple web application that allows
 
 **book.html:** *Displays the details of the user’s desired book, including ISBN, title, author, publication year, average rating, and the number of ratings, and provides users an area to submit their book reviews.*
 
-**error.html:** *Error message informing users that their book review failed to submit. The cause is usually because the user has already submitted a review for the book.*
-
 **index.html:** *Home page of the application. Welcomes the users to the website and provides the option to register an account or log in if they are returning users.*
 
 **login.html:** *Login page where users can log into their accounts.*
 
-**search.html:** *Provides users with three different ways to search for a book. Users can search for a book by ISBN, title, or author. After a search, a list of results will appear in the drop-down list where users can select and view details of their desired book.*
+**message.html:** *Informs the user whether or not his or her review has been successfully submitted.*
 
-**success.html:** *Success message informing users that their book review was submitted.*
+**search.html:** *Provides users with three different ways to search for a book. Users can search for a book by ISBN, title, or author. After a search, a list of results will appear in the drop-down list where users can select and view details of their desired book.*
 
 ### CSS
 
