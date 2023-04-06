@@ -8,43 +8,54 @@
 {% block body %}
 <div>
   <div>
-    <h1>Nittany Reads</h1>
-    <p class="welcomeText">
-      Welcome to our book review website Nittany Reads, where we invite you to explore the world 
-      of literature with us! Whether you're an avid reader, a casual book lover, or someone 
-      looking for your next great read, we're here to provide insightful and thought-provoking 
-      reviews of the latest books. Our team of passionate readers brings you honest and thorough 
-      reviews that will help you decide which books to add to your reading list. We believe reading 
-      is one of life's greatest pleasures, and we're thrilled to share our love of books with you. 
-      So sit back, grab a cup of tea or coffee, and enjoy browsing our website for your next literary adventure!
-    </p>
+    <center>
+      <h1>Nittany Reads</h1>
+      <p class="welcomeText">
+        Welcome to our book review website Nittany Reads, where we invite you to explore the world 
+        of literature with us! Whether you're an avid reader, a casual book lover, or someone 
+        looking for your next great read, we're here to provide insightful and thought-provoking 
+        reviews of the latest books. Our team of passionate readers brings you honest and thorough 
+        reviews that will help you decide which books to add to your reading list. We believe reading 
+        is one of life's greatest pleasures, and we're thrilled to share our love of books with you. 
+        So sit back, grab a cup of tea or coffee, and enjoy browsing our website for your next literary adventure!
+      </p>
+    </center>
   </div>
-  <div>
-    <!-- Register account -->
-    <h2>Registration</h2>
-    <form action="/register" method="POST">
-      <!-- Error message indicating failure in registration -->
-      {% if message %}
-      <p style="color:rgb(215, 14, 14)">{{ message | safe }}</p>
-      {% endif %}
-
-      <!-- Username -->
-      <label for="username">Username:</label>
-      <input type="text" id="username" name="username"><br><br>
-
-      <!-- Password -->
-      <label for="password">Password:</label>
-      <input type="text" id="password" name="password"><br><br>
-
-      <!-- Register button -->
-      <input type="submit" value="Register" class="button">
-    </form>
-
-    <!-- Login option for returning users -->
-    <form action="/login" method="POST">
-      <p>Have an account? <span><button class="logoutSignInButton" style="margin-top: 10px;">LOGIN</button></span></p>
-    </form>
-  </div>
+  <div class="container text-center">
+    <div class="row justify-content-md-center">
+      <div class="col col-lg-2">
+      </div>
+      <div class="col-md-auto">
+        <div>
+          <!-- Register account -->
+          <h2>Registration</h2>
+          <form action="/register" method="POST">
+            <!-- Error message indicating failure in registration -->
+            {% if message %}
+            <p style="color:rgb(215, 14, 14)">{{ message | safe }}</p>
+            {% endif %}
+      
+            <!-- Username -->
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username"><br><br>
+      
+            <!-- Password -->
+            <label for="password">Password:</label>
+            <input type="text" id="password" name="password"><br><br>
+      
+            <!-- Register button -->
+            <button class="button">Register</button>
+          </form>
+      
+          <!-- Login option for returning users -->
+          <form action="/login" method="POST">
+            <p>Have an account? <span><button class="logoutSignInButton" style="margin-top: 10px;">LOGIN</button></span></p>
+          </form>
+        </div>
+      </div>
+      <div class="col col-lg-2">
+      </div>
+    </div>
 </div>
 
 {% endblock %}

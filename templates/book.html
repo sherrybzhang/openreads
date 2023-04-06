@@ -17,35 +17,60 @@
     <h1>Book Details</h1>
     <p style="font-weight: bold; text-decoration: underline;">Here is what we found: </p>
 
-    <!-- ISBN -->
-    {% if isbn %}
-      <p style="color:rgb(226, 223, 223);">ISBN: {{ isbn | safe }}</p>
-    {% endif %}
-
-    <!-- Book title -->
-    {% if title %}
-      <p style="color:rgb(226, 223, 223);">{{ title | safe }}</p>
-    {% endif %}
-    
-    <!-- Book author -->
-    {% if author %}
-        <p style="color:rgb(226, 223, 223);">{{ author | safe }}</p>
-    {% endif %}
-
-    <!-- Publication year-->
-    {% if year %}
-        <p style="color:rgb(226, 223, 223);">{{ year | safe }}</p>
-    {% endif %}
-
-    <!-- Book's average rating -->
-    {% if averageRating %}
-        <p style="color:rgb(226, 223, 223);">{{ averageRating | safe }}</p>
-    {% endif %}
-
-    <!-- Number of ratings -->
-    {% if numberOfRating %}
-        <p style="color:rgb(226, 223, 223);">{{ numberOfRating | safe }}</p>
-    {% endif %}
+    <table class="table table-striped">
+      <tbody>
+        <tr>
+          <th scope="row">
+            ISBN
+          </th>
+          <td>
+            {% if isbn %}
+            <p>{{ isbn | safe }}</p>
+            {% endif %}
+          </td>
+        </tr>
+        <tr>
+          <th scope="row">Title</th>
+          <td>
+            {% if title %}
+            <p>{{ title | safe }}</p>
+            {% endif %}
+          </td>
+        </tr>
+        <tr>
+          <th scope="row">Author</th>
+          <td>
+            {% if author %}
+            <p>{{ author | safe }}</p>
+            {% endif %}
+          </td>
+        </tr>
+        <tr>
+          <th scope="row">Year</th>
+          <td>
+            {% if year %}
+            <p>{{ year | safe }}</p>
+            {% endif %}
+          </td>
+        </tr>
+        <tr>
+          <th scope="row">Average Rating</th>
+          <td>
+            {% if averageRating %}
+            <p>{{ averageRating | safe }}</p>
+            {% endif %}
+          </td>
+        </tr>
+        <tr>
+          <th scope="row">Number of Ratings</th>
+          <td>
+            {% if numberOfRating %}
+            <p>{{ numberOfRating | safe }}</p>
+            {% endif %}
+          </td>
+        </tr>
+      </tbody>
+    </table>
 
     <!-- Return to Search -->
     <form action="/returnToSearch" method="POST">
@@ -61,6 +86,7 @@
       <!-- User's rating of book -->
       <label for="rating">Rating:</label>
       <select id="rating" name="rating">
+        <option value=""></option>
         <option value="1">1</option>
         <option value="2">2</option>
         <option value="3">3</option>
@@ -68,10 +94,11 @@
         <option value="5">5</option>
       </select><br></br>
 
-      <label for="review">Review: </label><br></br>
-
       <!-- Review input -->
-      <textarea id="review" name="review" rows="10" cols="75" style="margin-top: -20px"></textarea><br></br>
+      <label for="review">Review: </label><br></br>
+      <div class="mb-3">
+        <textarea class="form-control" id="review" name="review" rows="7" style="margin-top: -20px; margin-bottom: -50px"></textarea><br></br>
+      </div>
 
       <!-- Submit button-->
       <button class="button">Submit Review</button>
