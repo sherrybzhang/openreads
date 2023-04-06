@@ -1,7 +1,11 @@
 {% extends "base.html" %}
 
 {% block head %}
-<title>Book Details</title>
+<title>
+  {% if title %}
+  {{ title | safe }}
+  {% endif %}
+</title>
 
 {% endblock %}
 
@@ -14,8 +18,11 @@
 
   <div>
     <!-- Provides user with book information -->
-    <h1>Book Details</h1>
-    <p style="font-weight: bold; text-decoration: underline;">Here is what we found: </p>
+    <h1>
+      {% if title %}
+      <p>{{ title | safe }}</p>
+      {% endif %}
+    </h1>
 
     <table class="table table-striped">
       <tbody>
@@ -86,7 +93,6 @@
       <!-- User's rating of book -->
       <label for="rating">Rating:</label>
       <select id="rating" name="rating">
-        <option value=""></option>
         <option value="1">1</option>
         <option value="2">2</option>
         <option value="3">3</option>
