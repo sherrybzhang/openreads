@@ -27,7 +27,7 @@ To enter the book review site, users will need to log in using their username an
 
 After arriving on the search page, users can look up their book of interest by ISBN, book title, or author name. To note, for a successful search, only one of the fields can be filled before pressing "Search." The application also supports searches where the ISBN, book title or author name is incomplete. If the book does not exist in the database, an error message will appear to notify the user. In the example below, the user searched for his book by the author's name, which is Rick Riordan.
 
-![Search](demo/search.png)
+![Search](demo/search1.png)
 
 Under "Results," users are given a drop-down list where they can find their desired books. This feature is helpful for those who submitted incomplete parts of the ISBN, book title, or author name. 
 
