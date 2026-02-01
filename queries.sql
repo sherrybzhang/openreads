@@ -1,17 +1,17 @@
-CREATE TABLE books (
+CREATE TABLE IF NOT EXISTS books (
     isbn VARCHAR PRIMARY KEY,
     title VARCHAR NOT NULL,
     author VARCHAR NOT NULL,
     year VARCHAR NOT NULL
 );
 
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
     username VARCHAR UNIQUE,
     password VARCHAR NOT NULL
 );
 
-CREATE TABLE reviews (
+CREATE TABLE IF NOT EXISTS reviews (
     reviewID SERIAL PRIMARY KEY,
     id INT NOT NULL,
     isbn VARCHAR NOT NULL,
