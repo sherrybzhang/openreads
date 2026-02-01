@@ -18,6 +18,7 @@ instance/
 
 # Flask
 *.log
+flask_session/
 
 # Tests/coverage
 .pytest_cache/
