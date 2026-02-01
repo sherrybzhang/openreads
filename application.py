@@ -1,5 +1,6 @@
 from googlebooksAPI import retrieveBook
 from flask import Flask, render_template, request, session
+from flask_session import Session
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.sql import text
@@ -11,6 +12,7 @@ app.secret_key = 'verySecretKey'
 # Configures session to use filesystem
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
+Session(app)
 
 # Sets up database
 engine = create_engine("postgresql://localhost/sherryzhang")
@@ -69,7 +71,7 @@ def login():
 
         # Username and/or password is missing
         if username == "" or password == "":
-            render_template("login.html", message = "* Username and/or password is incorrect")
+            return render_template("login.html", message = "* Username and/or password is incorrect")
         
         # Checks if username/password exists in database and if it matches the user's inputs
         userInfo = db.execute(text("SELECT * FROM users WHERE username = :username AND password = :password"), 

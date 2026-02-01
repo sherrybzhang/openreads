@@ -5,8 +5,10 @@ import json
 
 def retrieveBook(isbn, type):
     url = "https://www.googleapis.com/books/v1/volumes?"
-    res = requests.get(url, 
-                   params={ "q": {isbn} })
+    res = requests.get(
+        url,
+        params={"q": f"isbn:{isbn}"},
+    )
     if res.status_code != 200:
         raise Exception("ERROR: API request unsuccessful.")
 
