@@ -1,0 +1,11 @@
+{
+  "name": "openreads",
+  "private": true,
+  "devDependencies": {
+    "prettier": "^3.2.5"
+  },
+  "scripts": {
+    "format:html": "prettier --write \"app/templates/**/*.html\"",
+    "format:css": "prettier --write \"app/static/**/*.css\""
+  }
+}
