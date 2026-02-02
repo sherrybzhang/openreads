@@ -14,6 +14,8 @@ ENV/
 # Environment/config
 .env
 .env.*
+.envrc
+.direnv/
 instance/
 
 # Flask
@@ -23,7 +25,14 @@ flask_session/
 # Tests/coverage
 .pytest_cache/
 .coverage
+.coverage.*
 htmlcov/
+coverage.xml
+
+# Type checking / lint caches
+.mypy_cache/
+.ruff_cache/
+.cache/
 
 # Build artifacts
 build/
@@ -38,9 +47,16 @@ dist/
 
 # Local database dumps
 *.sqlite3
+*.sqlite
 *.db
 *.dump
+
+# Python version manager
+.python-version
 
 # Temporary files
 *.tmp
 *.swp
+
+# Node
+node_modules/
