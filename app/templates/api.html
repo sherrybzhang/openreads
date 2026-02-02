@@ -12,12 +12,12 @@
 
   <!-- Successful API search -->
   {% if success %}
-    <p style="color:rgb(226, 223, 223);">{{ success | safe }}</p>
+    <p style="color:rgb(226, 223, 223);">{{ success }}</p>
   {% endif %}
 
   <!-- Error with user given ISBN -->
   {% if error %}
-    <p style="color:rgb(226, 223, 223);">{{ error | safe }}</p>
+    <p style="color:rgb(226, 223, 223);">{{ error }}</p>
   {% endif %}
 
   <!-- Return to Search -->

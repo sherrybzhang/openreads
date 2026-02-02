@@ -32,7 +32,7 @@
           <form action="/register" method="POST">
             <!-- Error message indicating failure in registration -->
             {% if message %}
-            <p style="color:rgb(215, 14, 14)">{{ message | safe }}</p>
+            <p style="color:rgb(215, 14, 14)">{{ message }}</p>
             {% endif %}
       
             <!-- Username -->
@@ -41,7 +41,7 @@
       
             <!-- Password -->
             <label for="password">Password:</label>
-            <input type="text" id="password" name="password"><br><br>
+            <input type="password" id="password" name="password"><br><br>
       
             <!-- Register button -->
             <button class="button">Register</button>
