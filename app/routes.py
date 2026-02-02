@@ -1,6 +1,6 @@
 from app import app, db
 from app.services.google_books import retrieveBook
-from flask import render_template, request, session
+from flask import render_template, request, session, redirect, url_for
 from sqlalchemy.sql import text
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -9,12 +9,10 @@ from werkzeug.security import check_password_hash, generate_password_hash
 def index():
     return render_template("index.html")
 
-# Sets up session
-@app.route("/set_session")
-def set_session(id):
-    session["id"] = id
+# Session helpers
+def set_session(user_id):
+    session["id"] = user_id
 
-@app.route("/get_session")
 def get_session():
     return session.get("id")
 
@@ -91,7 +89,7 @@ def login():
 def logout():
     if request.method == "POST":
         session.pop("id", None)  # Ends user session
-        return render_template("index.html")
+        return redirect(url_for("index"))
 
 # Performs book search
 @app.route("/search", methods=["POST"])
