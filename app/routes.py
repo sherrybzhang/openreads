@@ -2,6 +2,7 @@ from app import app, db
 from app.services.google_books import retrieveBook
 from flask import render_template, request, session
 from sqlalchemy.sql import text
+from werkzeug.security import check_password_hash, generate_password_hash
 
 # Routes to home page
 @app.route("/")
@@ -42,11 +43,12 @@ def register():
             )
 
         # Creating new account for the user
+        password_hash = generate_password_hash(password)
         db.execute(
             text(
                 "INSERT INTO users (username, password) VALUES (:username, :password)"
             ),
-            {"username": username, "password": password},
+            {"username": username, "password": password_hash},
         )
         db.commit()
 
@@ -71,20 +73,13 @@ def login():
                 "login.html", message="* Username and/or password is incorrect"
             )
 
-        # Checks if username/password exists in database and if it matches the user's inputs
+        # Checks if username exists, then validates password hash
         userInfo = db.execute(
-            text(
-                "SELECT * FROM users WHERE username = :username AND password = :password"
-            ),
-            {"username": username, "password": password},
+            text("SELECT id, password FROM users WHERE username = :username"),
+            {"username": username},
         ).fetchone()
-        if username != "" and password != "":
-            id = db.execute(
-                text("SELECT id FROM users WHERE username = :username"),
-                {"username": username},
-            ).fetchone()[0]
-            set_session(id)  # Remembers user when they log in
-        if userInfo:
+        if userInfo and check_password_hash(userInfo[1], password):
+            set_session(userInfo[0])  # Remembers user when they log in
             return render_template("search.html")
 
         return render_template(
