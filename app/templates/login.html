@@ -17,7 +17,7 @@
 
     <!-- Error message indicating failure in login -->
     {% if message %}
-      <p class="message" style="color:rgb(215, 14, 14)">{{ message | safe }}</p>
+      <p class="message" style="color:rgb(215, 14, 14)">{{ message }}</p>
     {% endif %}
 
     <!-- Login -->
@@ -28,7 +28,7 @@
 
       <!-- Password -->
       <label for="password">Password:</label>
-      <input type="text" id="password" name="password"><br><br>
+      <input type="password" id="password" name="password"><br><br>
 
       <!-- Login button -->
       <button class="button">Login</button>
