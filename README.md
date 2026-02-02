@@ -28,7 +28,7 @@ export DATABASE_URL="postgresql://localhost/your_db"
 ```
 4) Create tables:
 ```
-psql -d your_db -f schema.sql
+psql -d your_db -f db/schema.sql
 ```
 5) Load sample data (optional):
 ```
