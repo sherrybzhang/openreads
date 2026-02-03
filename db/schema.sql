@@ -2,12 +2,12 @@ CREATE TABLE IF NOT EXISTS books (
     isbn VARCHAR PRIMARY KEY,
     title VARCHAR NOT NULL,
     author VARCHAR NOT NULL,
-    year VARCHAR NOT NULL
+    year SMALLINT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
-    username VARCHAR UNIQUE,
+    username VARCHAR NOT NULL UNIQUE,
     password VARCHAR NOT NULL
 );
 
@@ -16,7 +16,14 @@ CREATE TABLE IF NOT EXISTS reviews (
     id INT NOT NULL,
     isbn VARCHAR NOT NULL,
     rating INTEGER NOT NULL,
-    review VARCHAR,
-    FOREIGN KEY (id) REFERENCES users(id),
-    FOREIGN KEY (isbn) REFERENCES books(isbn)
+    review TEXT,
+    created_at TIMESTAMP DEFAULT NOW(),
+    FOREIGN KEY (id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (isbn) REFERENCES books(isbn) ON DELETE CASCADE,
+    UNIQUE (id, isbn),
+    CHECK (rating BETWEEN 1 AND 5)
 );
+
+CREATE INDEX ON books(title);
+CREATE INDEX ON books(author);
+CREATE INDEX ON reviews(isbn);
