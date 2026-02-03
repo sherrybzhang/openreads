@@ -1,8 +1,6 @@
 # Google Books API Documentation: https://developers.google.com/books/docs/v1/using
-
 import json
 import requests
-
 
 def retrieveBook(isbn, type):
     url = "https://www.googleapis.com/books/v1/volumes?"
