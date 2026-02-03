@@ -5,5 +5,4 @@ psycopg2-binary
 SQLAlchemy
 requests
 pytest
-black
 sqlformat

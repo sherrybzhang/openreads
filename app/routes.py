@@ -9,12 +9,15 @@ from werkzeug.security import check_password_hash, generate_password_hash
 def index():
     return render_template("index.html")
 
+
 # Session helpers
 def set_session(user_id):
     session["id"] = user_id
 
+
 def get_session():
     return session.get("id")
+
 
 # Handles user registrations
 @app.route("/register", methods=["POST"])
@@ -52,12 +55,14 @@ def register():
 
         return render_template("login.html")
 
+
 # LOGIN option on home page that routes to login page. Used by users that already have an account
 @app.route("/login", methods=["GET", "POST"])
 def signin():
     if request.method == "POST":
         return render_template("login.html")
     return render_template("login.html")
+
 
 # Logs in the user, begins user session, and redirects to search page
 @app.route("/signin", methods=["POST"])
@@ -85,12 +90,14 @@ def login():
             "login.html", message="* Username and/or password is incorrect"
         )
 
+
 # Logs user out and ends session
 @app.route("/logout", methods=["POST"])
 def logout():
     if request.method == "POST":
         session.pop("id", None)  # Ends user session
         return redirect(url_for("index"))
+
 
 # Performs book search
 @app.route("/search", methods=["GET", "POST"])
@@ -137,13 +144,14 @@ def search():
                 "search.html", message="* Please fill out at most one field below"
             )
 
-# Returns user to search page
-
+    # Returns user to search page
     return render_template("search.html")
+
 
 @app.route("/returnToSearch", methods=["GET", "POST"])
 def returntoSearch():
     return render_template("search.html")
+
 
 # Extracts information on the user's desired book and outputs it on book page
 @app.route("/view", methods=["GET", "POST"])
@@ -185,9 +193,11 @@ def view():
             reviews=reviews,
         )
 
-# Submits user's book review
+    # Submits user's book review
+    return render_template(
+        "search.html", message="* Please enter a book ISBN, title, or author first"
+    )
 
-    return render_template("search.html", message="* Please enter a book ISBN, title, or author first")
 
 @app.route("/review", methods=["POST"])
 def review():
@@ -221,6 +231,7 @@ def review():
             return render_template(
                 "message.html", success="Your review has been successfully submitted!"
             )
+
 
 # Redirects user to a new page containing book information pulled from Google Books API
 @app.route("/api/<isbn>")

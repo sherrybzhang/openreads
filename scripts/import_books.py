@@ -6,7 +6,6 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.sql import text
 
-
 def get_database_url() -> str:
     """
     Return the database URL from environment or a local default.

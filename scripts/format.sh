@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-python -m black .
 python -m sqlformat -r -k upper -i 4 schema.sql
 
 if command -v npx >/dev/null 2>&1; then
