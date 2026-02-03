@@ -53,10 +53,11 @@ def register():
         return render_template("login.html")
 
 # LOGIN option on home page that routes to login page. Used by users that already have an account
-@app.route("/login", methods=["POST"])
+@app.route("/login", methods=["GET", "POST"])
 def signin():
     if request.method == "POST":
         return render_template("login.html")
+    return render_template("login.html")
 
 # Logs in the user, begins user session, and redirects to search page
 @app.route("/signin", methods=["POST"])
@@ -92,7 +93,7 @@ def logout():
         return redirect(url_for("index"))
 
 # Performs book search
-@app.route("/search", methods=["POST"])
+@app.route("/search", methods=["GET", "POST"])
 def search():
     if request.method == "POST":
         isbn = request.form["isbn"]
@@ -137,13 +138,15 @@ def search():
             )
 
 # Returns user to search page
-@app.route("/returnToSearch", methods=["POST"])
+
+    return render_template("search.html")
+
+@app.route("/returnToSearch", methods=["GET", "POST"])
 def returntoSearch():
-    if request.method == "POST":
-        return render_template("search.html")
+    return render_template("search.html")
 
 # Extracts information on the user's desired book and outputs it on book page
-@app.route("/view", methods=["POST"])
+@app.route("/view", methods=["GET", "POST"])
 def view():
     if request.method == "POST":
         # User hits 'View Book' button before completing a search
@@ -183,6 +186,9 @@ def view():
         )
 
 # Submits user's book review
+
+    return render_template("search.html", message="* Please enter a book ISBN, title, or author first")
+
 @app.route("/review", methods=["POST"])
 def review():
     if request.method == "POST":
