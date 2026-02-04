@@ -1,47 +1,38 @@
 {% extends "base.html" %}
 
 {% block head %}
-<title>
-  {% if error %}
-  Error
-  {% endif %}
-
-  {% if success %}
-  Success
-  {% endif %}
-</title>
+<title>Status</title>
 
 {% endblock %}
 
 {% block body %}
-<div>
-  <!-- Logout -->
+<header class="site-header">
+  <div class="brand">
+    <div class="brand-mark">OR</div>
+    <div>
+      <div class="brand-name">OpenReads</div>
+      <p class="brand-tag">Update</p>
+    </div>
+  </div>
   <form action="/logout" method="POST">
-    <button class="logoutSignInButton">LOGOUT</button>
+    <button class="btn btn-ghost" type="submit">Logout</button>
   </form>
+</header>
 
-  <h1>
-    {% if error %}
-    Error
-    {% endif %}
-
-    {% if success %}
-    Success
-    {% endif %}
-  </h1>
-
+<section class="card" style="max-width: 640px; --delay: 0.08s;">
   {% if error %}
-  <p style="color:rgb(226, 223, 223);">{{ error }}</p>
+    <h1>Unable to complete</h1>
+    <div class="alert">{{ error }}</div>
   {% endif %}
 
   {% if success %}
-    <p class="success" style="color:rgb(226, 223, 223);">{{ success }}</p>
+    <h1>Success</h1>
+    <div class="alert success">{{ success }}</div>
   {% endif %}
 
-  <!-- Return to Search -->
-  <form action="/returnToSearch" method="POST">
-    <button class="button">Return to Search</button>
+  <form action="/returnToSearch" method="POST" style="margin-top: 18px;">
+    <button class="btn btn-ghost" type="submit">Return to Search</button>
   </form>
-</div>
+</section>
 
 {% endblock %}

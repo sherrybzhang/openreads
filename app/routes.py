@@ -103,14 +103,15 @@ def logout():
 @app.route("/search", methods=["GET", "POST"])
 def search():
     if request.method == "POST":
-        isbn = request.form["isbn"]
-        title = request.form["title"]
-        author = request.form["author"]
+        isbn = request.form["isbn"].strip()
+        title = request.form["title"].strip()
+        author = request.form["author"].strip()
 
         # Search by ISBN
         if isbn and title == "" and author == "":
             books = db.execute(
-                text("SELECT * FROM books WHERE isbn LIKE :isbn"), {"isbn": isbn + "%"}
+                text("SELECT * FROM books WHERE isbn ILIKE :isbn"),
+                {"isbn": f"%{isbn}%"},
             ).fetchall()
             if books:
                 return render_template("search.html", books=books)
@@ -120,8 +121,8 @@ def search():
         # Search by Book Title
         elif title and isbn == "" and author == "":
             books = db.execute(
-                text("SELECT * FROM books WHERE title LIKE :title"),
-                {"title": title + "%"},
+                text("SELECT * FROM books WHERE title ILIKE :title"),
+                {"title": f"%{title}%"},
             ).fetchall()
             if books:
                 return render_template("search.html", books=books)
@@ -131,8 +132,8 @@ def search():
         # Search by Author
         elif author and isbn == "" and title == "":
             books = db.execute(
-                text("SELECT * FROM books WHERE author LIKE :author"),
-                {"author": author + "%"},
+                text("SELECT * FROM books WHERE author ILIKE :author"),
+                {"author": f"%{author}%"},
             ).fetchall()
             if books:
                 return render_template("search.html", books=books)

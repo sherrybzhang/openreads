@@ -1,29 +1,35 @@
 {% extends "base.html" %}
 
 {% block head %}
-<title>Google Books API Search</title>
+<title>Google Books API</title>
 
 {% endblock %}
 
 {% block body %}
-<div>
-  <h1>Google Books API Search</h1>
-  <h3>Result:</h3>
-
-  <!-- Successful API search -->
-  {% if success %}
-    <p style="color:rgb(226, 223, 223);">{{ success }}</p>
-  {% endif %}
-
-  <!-- Error with user given ISBN -->
-  {% if error %}
-    <p style="color:rgb(226, 223, 223);">{{ error }}</p>
-  {% endif %}
-
-  <!-- Return to Search -->
+<header class="site-header">
+  <div class="brand">
+    <div class="brand-mark">OR</div>
+    <div>
+      <div class="brand-name">OpenReads</div>
+      <p class="brand-tag">API response</p>
+    </div>
+  </div>
   <form action="/returnToSearch" method="POST">
-    <button class="button">Return to Search</button>
+    <button class="btn btn-ghost" type="submit">Return to Search</button>
   </form>
-</div>
+</header>
+
+<section class="card" style="--delay: 0.08s;">
+  <h1>Google Books API</h1>
+  <p class="muted">Raw data returned for the requested ISBN.</p>
+
+  {% if success %}
+    <pre class="code-block">{{ success }}</pre>
+  {% endif %}
+
+  {% if error %}
+    <pre class="code-block">{{ error }}</pre>
+  {% endif %}
+</section>
 
 {% endblock %}
