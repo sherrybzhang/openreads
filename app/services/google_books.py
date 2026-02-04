@@ -93,7 +93,7 @@ def retrieveBook(isbn: str, query: BookQuery) -> Optional[str]:
     editAuthor = authors if len(authors) > 1 else (authors[0] if authors else "Unknown")
 
     rating = volumeInfo.get("averageRating", "Unavailable")
-    reviewCount = volumeInfo.get("ratingsCount", "0")
+    reviewCount = volumeInfo.get("ratingsCount", 0)
 
     if query == BookQuery.JSON:
         # Return a compact JSON string for API route usage
@@ -146,7 +146,7 @@ def _fallback_response(isbn: str, query: BookQuery) -> Optional[str]:
                 "error": "Google Books API request failed",
                 "isbn": isbn,
                 "average_rating": "Unavailable",
-                "review_count": "0",
+                "review_count": 0,
             }
         )
     if query == BookQuery.AVERAGE_RATING:
@@ -154,5 +154,5 @@ def _fallback_response(isbn: str, query: BookQuery) -> Optional[str]:
         return "Unavailable"
     if query == BookQuery.NUMBER_OF_RATING:
         # Match the ratings count return type on failure
-        return "0"
+        return 0
     return None
