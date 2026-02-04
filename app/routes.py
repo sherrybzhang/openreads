@@ -1,3 +1,5 @@
+import json
+
 from app import app, db
 from app.services.google_books import BookQuery, retrieve_book
 from flask import render_template, request, session, redirect, url_for
@@ -250,7 +252,16 @@ def apiInfo(isbn):
 
     if checkISBN:
         success = retrieve_book(isbn, BookQuery.JSON)
-        return render_template("api.html", success=success)
+        try:
+            book_data = json.loads(success) if success else None
+        except (TypeError, json.JSONDecodeError):
+            book_data = None
+
+        if book_data and book_data.get("error"):
+            return render_template("api.html", error=book_data["error"])
+        if book_data:
+            return render_template("api.html", book_data=book_data)
+        return render_template("api.html", error="Unable to fetch book details.")
     else:
         error = (
             "404 Error. The requested URL /api/"
