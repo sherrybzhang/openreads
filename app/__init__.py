@@ -1,8 +1,10 @@
 from flask import Flask
+from dotenv import load_dotenv
 from flask_session import Session
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 
+load_dotenv()
 app = Flask(__name__)
 app.config.from_object("app.config.Config")
 app.secret_key = app.config["SECRET_KEY"]
