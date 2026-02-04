@@ -1,11 +1,7 @@
-{% extends "base.html" %}
-
-{% block head %}
+{% extends "base.html" %} {% block head %}
 <title>Google Books API</title>
 
-{% endblock %}
-
-{% block body %}
+{% endblock %} {% block body %}
 <header class="site-header">
   <div class="brand">
     <div class="brand-mark">OR</div>
@@ -19,16 +15,42 @@
   </form>
 </header>
 
-<section class="card" style="--delay: 0.08s;">
-  <h1>Google Books API</h1>
-  <p class="muted">Raw data returned for the requested ISBN.</p>
+<section class="card" style="--delay: 0.08s">
+  <h1>Google Books</h1>
+  <p class="muted">Details returned for the requested ISBN.</p>
 
-  {% if success %}
-    <pre class="code-block">{{ success }}</pre>
-  {% endif %}
-
-  {% if error %}
-    <pre class="code-block">{{ error }}</pre>
+  {% if book_data %}
+  <div class="spec-grid">
+    <div class="spec">
+      <span class="spec-label">Title</span>
+      <span>{{ book_data.title }}</span>
+    </div>
+    <div class="spec">
+      <span class="spec-label">Author</span>
+      <span>{{ book_data.author }}</span>
+    </div>
+    <div class="spec">
+      <span class="spec-label">Year</span>
+      <span>{{ book_data.year }}</span>
+    </div>
+    <div class="spec">
+      <span class="spec-label">ISBN</span>
+      <span>{{ book_data.isbn }}</span>
+    </div>
+    <div class="spec">
+      <span class="spec-label">Average Rating</span>
+      <span
+        >{{ book_data.average_rating if book_data.average_rating is not none else "Unavailable"
+        }}</span
+      >
+    </div>
+    <div class="spec">
+      <span class="spec-label">Review Count</span>
+      <span>{{ book_data.review_count if book_data.review_count is not none else "0" }}</span>
+    </div>
+  </div>
+  {% endif %} {% if error %}
+  <div class="alert" style="margin-top: 16px">{{ error }}</div>
   {% endif %}
 </section>
 
