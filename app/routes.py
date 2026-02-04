@@ -21,6 +21,37 @@ def get_session():
     return session.get("id")
 
 
+def build_book_context(isbn):
+    book_row = db.execute(
+        text("SELECT title, author, year FROM books WHERE isbn = :isbn"),
+        {"isbn": isbn},
+    ).fetchone()
+    if not book_row:
+        return None
+
+    title, author, year = book_row
+    averageRating = retrieve_book(isbn, BookQuery.AVERAGE_RATING)
+    numberOfRating = retrieve_book(isbn, BookQuery.NUMBER_OF_RATING)
+    reviews = db.execute(
+        text("SELECT * FROM reviews WHERE isbn = :isbn"), {"isbn": isbn}
+    ).fetchall()
+    localReviewCount = len(reviews)
+    localAverageRating = db.execute(
+        text("SELECT AVG(rating) FROM reviews WHERE isbn = :isbn"), {"isbn": isbn}
+    ).fetchone()[0]
+
+    return {
+        "title": title,
+        "author": author,
+        "year": year,
+        "averageRating": averageRating,
+        "numberOfRating": numberOfRating,
+        "reviews": reviews,
+        "localReviewCount": localReviewCount,
+        "localAverageRating": localAverageRating,
+    }
+
+
 # Handles user registrations
 @app.route("/register", methods=["POST"])
 def register():
@@ -171,34 +202,14 @@ def view():
         )
 
     # Selecting desired information from 'books' table in database
-    book_row = db.execute(
-        text("SELECT title, author, year FROM books WHERE isbn = :isbn"),
-        {"isbn": isbn},
-    ).fetchone()
-    if not book_row:
+    context = build_book_context(isbn)
+    if not context:
         return render_template("search.html", message="* Book not found")
-    title, author, year = book_row
-    averageRating = retrieve_book(isbn, BookQuery.AVERAGE_RATING)
-    numberOfRating = retrieve_book(isbn, BookQuery.NUMBER_OF_RATING)
-    reviews = db.execute(
-        text("SELECT * FROM reviews WHERE isbn = :isbn"), {"isbn": isbn}
-    ).fetchall()
-    localReviewCount = len(reviews)
-    localAverageRating = db.execute(
-        text("SELECT AVG(rating) FROM reviews WHERE isbn = :isbn"), {"isbn": isbn}
-    ).fetchone()[0]
 
     return render_template(
         "book.html",
         isbn=isbn,
-        title=title,
-        author=author,
-        year=year,
-        averageRating=averageRating,
-        numberOfRating=numberOfRating,
-        localReviewCount=localReviewCount,
-        localAverageRating=localAverageRating,
-        reviews=reviews,
+        **context,
     )
 
 
@@ -210,9 +221,24 @@ def review():
             return render_template(
                 "login.html", message="* Please log in to submit a review"
             )
-        isbn = request.form["isbn"]
-        review = request.form["review"]
-        rating = request.form["rating"]
+        isbn = request.form.get("isbn", "").strip()
+        review = request.form.get("review", "").strip()
+        rating = request.form.get("rating", "").strip()
+        if not isbn or not review or not rating:
+            if not isbn:
+                return render_template(
+                    "search.html",
+                    message="* Please enter a book ISBN, title, or author first",
+                )
+            context = build_book_context(isbn)
+            if not context:
+                return render_template("search.html", message="* Book not found")
+            return render_template(
+                "book.html",
+                isbn=isbn,
+                review_error="Please provide a rating and review.",
+                **context,
+            )
 
         # User already has existing review for the book
         existingReviewCheck = db.execute(
