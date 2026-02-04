@@ -3,6 +3,7 @@ import json
 import os
 import logging
 import requests
+
 from enum import Enum
 from typing import Literal, Optional, overload
 
@@ -37,15 +38,15 @@ class BookQuery(Enum):
 
 
 @overload
-def retrieveBook(isbn: str, query: Literal[BookQuery.JSON]) -> str: ...
+def retrieve_book(isbn: str, query: Literal[BookQuery.JSON]) -> str: ...
 
 @overload
-def retrieveBook(isbn: str, query: Literal[BookQuery.AVERAGE_RATING]) -> str: ...
+def retrieve_book(isbn: str, query: Literal[BookQuery.AVERAGE_RATING]) -> Optional[float]: ...
 
 @overload
-def retrieveBook(isbn: str, query: Literal[BookQuery.NUMBER_OF_RATING]) -> str: ...
+def retrieve_book(isbn: str, query: Literal[BookQuery.NUMBER_OF_RATING]) -> int: ...
 
-def retrieveBook(isbn: str, query: BookQuery) -> Optional[str]:
+def retrieve_book(isbn: str, query: BookQuery) -> Optional[object]:
     """
     Retrieve Google Books data for a given ISBN.
 
@@ -54,7 +55,7 @@ def retrieveBook(isbn: str, query: BookQuery) -> Optional[str]:
         query: The type of data to return.
 
     Returns:
-        JSON string, rating value, rating count, or None if unavailable.
+        JSON string, rating value (float or None), rating count (int), or None if unavailable.
     """
     if not _is_valid_isbn(isbn):
         logger.warning("Invalid ISBN provided: %s", isbn)
@@ -92,7 +93,8 @@ def retrieveBook(isbn: str, query: BookQuery) -> Optional[str]:
     authors = volumeInfo.get("authors", [])
     editAuthor = authors if len(authors) > 1 else (authors[0] if authors else "Unknown")
 
-    rating = volumeInfo.get("averageRating", "Unavailable")
+    rating_raw = volumeInfo.get("averageRating")
+    rating = float(rating_raw) if rating_raw is not None else None
     reviewCount = volumeInfo.get("ratingsCount", 0)
 
     if query == BookQuery.JSON:
@@ -128,7 +130,7 @@ def _fallback_response(isbn: str, query: Literal[BookQuery.AVERAGE_RATING]) -> s
 @overload
 def _fallback_response(isbn: str, query: Literal[BookQuery.NUMBER_OF_RATING]) -> str: ...
 
-def _fallback_response(isbn: str, query: BookQuery) -> Optional[str]:
+def _fallback_response(isbn: str, query: BookQuery) -> Optional[object]:
     """
     Return a safe fallback response when API data is unavailable.
 
@@ -151,7 +153,7 @@ def _fallback_response(isbn: str, query: BookQuery) -> Optional[str]:
         )
     if query == BookQuery.AVERAGE_RATING:
         # Match the rating return type on failure
-        return "Unavailable"
+        return None
     if query == BookQuery.NUMBER_OF_RATING:
         # Match the ratings count return type on failure
         return 0
