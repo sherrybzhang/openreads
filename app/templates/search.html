@@ -6,55 +6,56 @@
 {% endblock %}
 
 {% block body %}
-<div>
-  <!-- Logout -->
+<header class="site-header">
+  <div class="brand">
+    <div class="brand-mark">OR</div>
+    <div>
+      <div class="brand-name">OpenReads</div>
+      <p class="brand-tag">Search and review.</p>
+    </div>
+  </div>
   <form action="/logout" method="POST">
-    <button class="logoutSignInButton">LOGOUT</button>
+    <button class="btn btn-ghost" type="submit">Logout</button>
   </form>
+</header>
 
-  <div>
+<section class="grid-2">
+  <div class="card" style="--delay: 0.05s;">
     <h1>Search</h1>
-    <p>To search for a book, please enter the book's ISBN number, title, or author.</p>
+    <p class="muted">Search by ISBN, title, or author. Fill out just one field.</p>
 
-    <!-- Error message indicating failure in search -->
     {% if message %}
-      <p class="message" style="color:rgb(215, 14, 14)">{{ message }}</p>
+      <div class="alert">{{ message }}</div>
     {% endif %}
 
-    <!-- Book search -->
-    <form action="/search", method="POST">
-      <!-- ISBN input -->
-      <label for="isbn" style="font-weight: bold;">ISBN:</label>
-      <input type="text" id="isbn" name="isbn" class="isbn"><br><br>
-
-      <!-- Title input -->
-      <label for="title" style="font-weight: bold;">Title:</label>
-      <input type="text" id="title" name="title" class="title"><br><br>
-
-      <!-- Author input -->
-      <label for="author" style="font-weight: bold;">Author:</label>
-      <input type="text" id="author" name="author" class="author"><br><br>
-
-      <!-- Search button -->
-      <button class="button">Search</button>
+    <form class="stack" action="/search" method="POST">
+      <div class="field">
+        <label for="isbn">ISBN</label>
+        <input class="input" type="text" id="isbn" name="isbn">
+      </div>
+      <div class="field">
+        <label for="title">Title</label>
+        <input class="input" type="text" id="title" name="title">
+      </div>
+      <div class="field">
+        <label for="author">Author</label>
+        <input class="input" type="text" id="author" name="author">
+      </div>
+      <button class="btn" type="submit">Search</button>
     </form>
   </div>
-  <div>
-      <h2 style="margin-top: 30px;">Results</h2>
-      
-      <!-- Select book from following results -->
-      <form action="/view" method="POST">
-        <div class="form-group">
-          <!-- Drop-down list of book results -->
-          <select class="form-control" name="book">
-              {% for books in books %}
-                <option value ="{{ books.isbn }}">{{ books.title}} ({{ books.year }}) by {{ books.author}}</option><br></br>
-              {% endfor %}
-           </select>
-        </div>
-        <button class="button">View Book</button>
-      </form>
+
+  <div class="card" style="--delay: 0.12s;">
+    <h2>Results</h2>
+    <form class="stack" action="/view" method="POST">
+      <select class="input" name="book">
+        {% for books in books %}
+          <option value="{{ books.isbn }}">{{ books.title }} ({{ books.year }}) by {{ books.author }}</option>
+        {% endfor %}
+      </select>
+      <button class="btn" type="submit">View Book</button>
+    </form>
   </div>
-</div>
+</section>
 
 {% endblock %}
