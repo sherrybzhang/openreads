@@ -132,8 +132,8 @@ def search():
         # Search by Author
         elif author and isbn == "" and title == "":
             books = db.execute(
-                text("SELECT * FROM books WHERE author ILIKE :author"),
-                {"author": f"%{author}%"},
+                text("SELECT * FROM books WHERE author LIKE :author"),
+                {"author": author + "%"},
             ).fetchall()
             if books:
                 return render_template("search.html", books=books)
