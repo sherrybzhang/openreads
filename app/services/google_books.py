@@ -1,10 +1,13 @@
 # Google Books API Documentation: https://developers.google.com/books/docs/v1/using
 import json
 import os
+import logging
+import requests
 from enum import Enum
 from typing import Literal, Optional, overload
 
-import requests
+
+logger = logging.getLogger(__name__)
 
 
 class BookQuery(Enum):
@@ -41,17 +44,22 @@ def retrieveBook(isbn: str, query: BookQuery) -> Optional[str]:
         if api_key:
             params["key"] = api_key
         res = requests.get(url, params=params, timeout=10)
-    except requests.RequestException:
+    except requests.RequestException as exc:
+        logger.warning("Google Books request failed for ISBN %s: %s", isbn, exc)
         # Network or request failure: return a safe fallback
         return _fallback_response(isbn, query)
 
     if res.status_code != 200:
+        logger.warning(
+            "Google Books non-200 response for ISBN %s: %s", isbn, res.status_code
+        )
         # Non-OK status: return a safe fallback
         return _fallback_response(isbn, query)
 
     bookData = res.json()
     items = bookData.get("items") or []
     if not items:
+        logger.info("Google Books returned no items for ISBN %s", isbn)
         # No results: return a safe fallback
         return _fallback_response(isbn, query)
 
