@@ -174,18 +174,13 @@ def view():
             )
 
         # Selecting desired information from 'books' table in database
-        title_row = db.execute(
-            text("SELECT title FROM books WHERE isbn = :isbn"), {"isbn": isbn}
+        book_row = db.execute(
+            text("SELECT title, author, year FROM books WHERE isbn = :isbn"),
+            {"isbn": isbn},
         ).fetchone()
-        if not title_row:
+        if not book_row:
             return render_template("search.html", message="* Book not found")
-        title = title_row[0]
-        author = db.execute(
-            text("SELECT author FROM books WHERE isbn = :isbn"), {"isbn": isbn}
-        ).fetchone()[0]
-        year = db.execute(
-            text("SELECT year FROM books WHERE isbn = :isbn"), {"isbn": isbn}
-        ).fetchone()[0]
+        title, author, year = book_row
         averageRating = retrieve_book(isbn, BookQuery.AVERAGE_RATING)
         numberOfRating = retrieve_book(isbn, BookQuery.NUMBER_OF_RATING)
         reviews = db.execute(
