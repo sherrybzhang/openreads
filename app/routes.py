@@ -275,4 +275,4 @@ def apiInfo(isbn):
             + isbn
             + " was not found on this server."
         )
-        return render_template("api.html", error=error)
+        return render_template("api.html", error=error), 404
