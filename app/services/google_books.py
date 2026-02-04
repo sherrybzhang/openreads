@@ -1,11 +1,16 @@
 # Google Books API Documentation: https://developers.google.com/books/docs/v1/using
 import json
+import os
 import requests
 
 def retrieveBook(isbn, type):
     url = "https://www.googleapis.com/books/v1/volumes?"
     try:
-        res = requests.get(url, params={"q": f"isbn:{isbn}"}, timeout=10)
+        params = {"q": f"isbn:{isbn}"}
+        api_key = os.environ.get("GOOGLE_BOOKS_API_KEY")
+        if api_key:
+            params["key"] = api_key
+        res = requests.get(url, params=params, timeout=10)
     except requests.RequestException:
         return _fallback_response(isbn, type)
 
