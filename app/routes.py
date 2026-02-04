@@ -86,7 +86,7 @@ def login():
         ).fetchone()
         if userInfo and check_password_hash(userInfo[1], password):
             set_session(userInfo[0])  # Remembers user when they log in
-            return render_template("search.html")
+            return redirect(url_for("search"))
 
         return render_template(
             "login.html", message="* Username and/or password is incorrect"
