@@ -9,6 +9,26 @@ from typing import Literal, Optional, overload
 
 logger = logging.getLogger(__name__)
 
+def _normalize_isbn(isbn: str) -> str:
+    """
+    Normalize ISBN by stripping spaces and hyphens.
+    """
+    return isbn.replace("-", "").replace(" ", "")
+
+
+def _is_valid_isbn(isbn: str) -> bool:
+    """
+    Return True if ISBN looks like a 10 or 13 character ISBN.
+    """
+    normalized = _normalize_isbn(isbn)
+    if len(normalized) == 10:
+        return normalized[:-1].isdigit() and (
+            normalized[-1].isdigit() or normalized[-1].upper() == "X"
+        )
+    if len(normalized) == 13:
+        return normalized.isdigit()
+    return False
+
 
 class BookQuery(Enum):
     JSON = "json"
@@ -36,10 +56,15 @@ def retrieveBook(isbn: str, query: BookQuery) -> Optional[str]:
     Returns:
         JSON string, rating value, rating count, or None if unavailable.
     """
+    if not _is_valid_isbn(isbn):
+        logger.warning("Invalid ISBN provided: %s", isbn)
+        return _fallback_response(isbn, query)
+
     url = "https://www.googleapis.com/books/v1/volumes?"
     try:
         # Build request params and include API key if available
-        params = {"q": f"isbn:{isbn}"}
+        normalized_isbn = _normalize_isbn(isbn)
+        params = {"q": f"isbn:{normalized_isbn}"}
         api_key = os.environ.get("GOOGLE_BOOKS_API_KEY")
         if api_key:
             params["key"] = api_key
