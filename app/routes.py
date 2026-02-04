@@ -55,7 +55,7 @@ def register():
         )
         db.commit()
 
-        return render_template("login.html")
+        return redirect(url_for("signin"))
 
 
 # LOGIN option on home page that routes to login page. Used by users that already have an account
@@ -248,9 +248,19 @@ def review():
             )
             db.commit()
 
-            return render_template(
-                "message.html", success="Your review has been successfully submitted!"
+            return redirect(
+                url_for(
+                    "message",
+                    success="Your review has been successfully submitted!",
+                )
             )
+
+
+@app.route("/message")
+def message():
+    success = request.args.get("success")
+    error = request.args.get("error")
+    return render_template("message.html", success=success, error=error)
 
 
 # Redirects user to a new page containing book information pulled from Google Books API
