@@ -142,10 +142,14 @@ def search():
             else:
                 return render_template("search.html", message="* No matches were found")
 
-        else:
+        if not isbn and not title and not author:
             return render_template(
-                "search.html", message="* Please fill out at most one field below"
+                "search.html", message="* Please fill out at least one field below"
             )
+
+        return render_template(
+            "search.html", message="* Please fill out at most one field below"
+        )
 
     # Returns user to search page
     return render_template("search.html")
