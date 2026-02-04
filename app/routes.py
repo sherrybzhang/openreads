@@ -1,5 +1,5 @@
 from app import app, db
-from app.services.google_books import retrieveBook
+from app.services.google_books import BookQuery, retrieveBook
 from flask import render_template, request, session, redirect, url_for
 from sqlalchemy.sql import text
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -176,8 +176,8 @@ def view():
         year = db.execute(
             text("SELECT year FROM books WHERE isbn = :isbn"), {"isbn": isbn}
         ).fetchone()[0]
-        averageRating = retrieveBook(isbn, "averageRating")
-        numberOfRating = retrieveBook(isbn, "numberOfRating")
+        averageRating = retrieveBook(isbn, BookQuery.AVERAGE_RATING)
+        numberOfRating = retrieveBook(isbn, BookQuery.NUMBER_OF_RATING)
         reviews = db.execute(
             text("SELECT * FROM reviews WHERE isbn = :isbn"), {"isbn": isbn}
         ).fetchall()
@@ -242,7 +242,7 @@ def apiInfo(isbn):
     ).fetchone()
 
     if checkISBN:
-        success = retrieveBook(isbn, "json")
+        success = retrieveBook(isbn, BookQuery.JSON)
         return render_template("api.html", success=success)
     else:
         error = (
