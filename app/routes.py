@@ -246,9 +246,16 @@ def review():
             {"id": id, "isbn": isbn},
         ).fetchone()
         if existingReviewCheck:
+            context = build_book_context(isbn)
+            if not context:
+                return render_template("search.html", message="* Book not found")
             return render_template(
-                "message.html",
-                error="Unable to submit review. You have already completed a review for this book.",
+                "book.html",
+                isbn=isbn,
+                review_error=(
+                    "Unable to submit review. You have already completed a review for this book."
+                ),
+                **context,
             )
 
         # Creating new review
