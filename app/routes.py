@@ -182,6 +182,10 @@ def view():
         reviews = db.execute(
             text("SELECT * FROM reviews WHERE isbn = :isbn"), {"isbn": isbn}
         ).fetchall()
+        localReviewCount = len(reviews)
+        localAverageRating = db.execute(
+            text("SELECT AVG(rating) FROM reviews WHERE isbn = :isbn"), {"isbn": isbn}
+        ).fetchone()[0]
 
         return render_template(
             "book.html",
@@ -191,6 +195,8 @@ def view():
             year=year,
             averageRating=averageRating,
             numberOfRating=numberOfRating,
+            localReviewCount=localReviewCount,
+            localAverageRating=localAverageRating,
             reviews=reviews,
         )
 
