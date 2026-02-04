@@ -212,6 +212,10 @@ def view():
 def review():
     if request.method == "POST":
         id = get_session()
+        if id is None:
+            return render_template(
+                "login.html", message="* Please log in to submit a review"
+            )
         isbn = request.form["isbn"]
         review = request.form["review"]
         rating = request.form["rating"]
