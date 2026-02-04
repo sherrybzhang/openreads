@@ -59,10 +59,8 @@ def register():
 
 
 # LOGIN option on home page that routes to login page. Used by users that already have an account
-@app.route("/login", methods=["GET", "POST"])
+@app.route("/login", methods=["GET"])
 def signin():
-    if request.method == "POST":
-        return render_template("login.html")
     return render_template("login.html")
 
 
@@ -161,52 +159,46 @@ def returntoSearch():
 
 
 # Extracts information on the user's desired book and outputs it on book page
-@app.route("/view", methods=["GET", "POST"])
+@app.route("/view", methods=["POST"])
 def view():
-    if request.method == "POST":
-        # User hits 'View Book' button before completing a search
-        try:
-            isbn = request.form["book"]
-        except KeyError:
-            return render_template(
-                "search.html",
-                message="* Please enter a book ISBN, title, or author first",
-            )
-
-        # Selecting desired information from 'books' table in database
-        book_row = db.execute(
-            text("SELECT title, author, year FROM books WHERE isbn = :isbn"),
-            {"isbn": isbn},
-        ).fetchone()
-        if not book_row:
-            return render_template("search.html", message="* Book not found")
-        title, author, year = book_row
-        averageRating = retrieve_book(isbn, BookQuery.AVERAGE_RATING)
-        numberOfRating = retrieve_book(isbn, BookQuery.NUMBER_OF_RATING)
-        reviews = db.execute(
-            text("SELECT * FROM reviews WHERE isbn = :isbn"), {"isbn": isbn}
-        ).fetchall()
-        localReviewCount = len(reviews)
-        localAverageRating = db.execute(
-            text("SELECT AVG(rating) FROM reviews WHERE isbn = :isbn"), {"isbn": isbn}
-        ).fetchone()[0]
-
+    # User hits 'View Book' button before completing a search
+    try:
+        isbn = request.form["book"]
+    except KeyError:
         return render_template(
-            "book.html",
-            isbn=isbn,
-            title=title,
-            author=author,
-            year=year,
-            averageRating=averageRating,
-            numberOfRating=numberOfRating,
-            localReviewCount=localReviewCount,
-            localAverageRating=localAverageRating,
-            reviews=reviews,
+            "search.html",
+            message="* Please enter a book ISBN, title, or author first",
         )
 
-    # Submits user's book review
+    # Selecting desired information from 'books' table in database
+    book_row = db.execute(
+        text("SELECT title, author, year FROM books WHERE isbn = :isbn"),
+        {"isbn": isbn},
+    ).fetchone()
+    if not book_row:
+        return render_template("search.html", message="* Book not found")
+    title, author, year = book_row
+    averageRating = retrieve_book(isbn, BookQuery.AVERAGE_RATING)
+    numberOfRating = retrieve_book(isbn, BookQuery.NUMBER_OF_RATING)
+    reviews = db.execute(
+        text("SELECT * FROM reviews WHERE isbn = :isbn"), {"isbn": isbn}
+    ).fetchall()
+    localReviewCount = len(reviews)
+    localAverageRating = db.execute(
+        text("SELECT AVG(rating) FROM reviews WHERE isbn = :isbn"), {"isbn": isbn}
+    ).fetchone()[0]
+
     return render_template(
-        "search.html", message="* Please enter a book ISBN, title, or author first"
+        "book.html",
+        isbn=isbn,
+        title=title,
+        author=author,
+        year=year,
+        averageRating=averageRating,
+        numberOfRating=numberOfRating,
+        localReviewCount=localReviewCount,
+        localAverageRating=localAverageRating,
+        reviews=reviews,
     )
 
 
