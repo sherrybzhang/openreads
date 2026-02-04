@@ -12,14 +12,20 @@
     <!-- CSS stylesheet: style.css -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 
-    <!-- Google Fonts: Source Serif Pro -->
+    <!-- Google Fonts: Fraunces + Manrope -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Source+Serif+Pro&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600;700&family=Manrope:wght@300;400;600;700&display=swap" rel="stylesheet">
     
     {% block head %}{% endblock %}
   </head>
   <body>
-    {% block body %}{% endblock %}
+    <div class="page">
+      <div class="bg-orb orb-1"></div>
+      <div class="bg-orb orb-2"></div>
+      <div class="shell">
+        {% block body %}{% endblock %}
+      </div>
+    </div>
   </body>
 </html>
