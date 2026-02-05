@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block head %}
-<title>Search</title>
+<title>OpenReads</title>
 
 {% endblock %}
 
@@ -11,7 +11,7 @@
     <div class="brand-mark">OR</div>
     <div>
       <div class="brand-name">OpenReads</div>
-      <p class="brand-tag">Search and review.</p>
+      <p class="brand-tag">Search and review</p>
     </div>
   </div>
   <form action="/logout" method="POST">
@@ -21,7 +21,7 @@
 
 <section class="grid-2">
   <div class="card" style="--delay: 0.05s;">
-    <h1>Search</h1>
+    <h2>Search</h2>
     <p class="muted">Search by ISBN, title, or author. Fill out just one field.</p>
 
     {% if message %}
@@ -48,11 +48,13 @@
   <div class="card" style="--delay: 0.12s;">
     <h2>Results</h2>
     <form class="stack" action="/view" method="POST">
-      <select class="input" name="book">
-        {% for books in books %}
-          <option value="{{ books.isbn }}">{{ books.title }} ({{ books.year }}) by {{ books.author }}</option>
-        {% endfor %}
-      </select>
+      <div class="select">
+        <select class="input" name="book">
+          {% for books in books %}
+            <option value="{{ books.isbn }}">{{ books.title }} ({{ books.year }}) by {{ books.author }}</option>
+          {% endfor %}
+        </select>
+      </div>
       <button class="btn" type="submit">View Book</button>
     </form>
   </div>

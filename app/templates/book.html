@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block head %}
-<title>{{ title }}</title>
+<title>OpenReads</title>
 
 {% endblock %}
 
@@ -70,13 +70,15 @@
     <form class="stack" action="/review" method="POST">
       <div class="field">
         <label for="rating">Rating</label>
-        <select id="rating" name="rating">
-          <option value="1">1</option>
-          <option value="2">2</option>
-          <option value="3">3</option>
-          <option value="4">4</option>
-          <option value="5">5</option>
-        </select>
+        <div class="select">
+          <select id="rating" name="rating">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+          </select>
+        </div>
       </div>
       <div class="field">
         <label for="review">Review</label>
