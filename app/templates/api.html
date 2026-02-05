@@ -1,5 +1,5 @@
 {% extends "base.html" %} {% block head %}
-<title>Google Books API</title>
+<title>OpenReads</title>
 
 {% endblock %} {% block body %}
 <header class="site-header">
@@ -10,13 +10,13 @@
       <p class="brand-tag">API response</p>
     </div>
   </div>
-  <form action="/returnToSearch" method="POST">
-    <button class="btn btn-ghost" type="submit">Return to Search</button>
+  <form action="/logout" method="POST">
+    <button class="btn btn-ghost" type="submit">Logout</button>
   </form>
 </header>
 
 <section class="card" style="--delay: 0.08s">
-  <h1>Google Books</h1>
+  <h1>Google Books API Response</h1>
   <p class="muted">Details returned for the requested ISBN.</p>
 
   {% if book_data %}
@@ -52,6 +52,10 @@
   {% endif %} {% if error %}
   <div class="alert" style="margin-top: 16px">{{ error }}</div>
   {% endif %}
+
+  <form action="/returnToSearch" method="POST" style="margin-top: 18px;">
+    <button class="btn btn-ghost" type="submit">Return to Search</button>
+  </form>
 </section>
 
 {% endblock %}
