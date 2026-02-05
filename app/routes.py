@@ -15,7 +15,7 @@ def index():
     Returns:
         Rendered HTML response for the index page.
     """
-    return render_template("index.html")
+    return render_template("home.html")
 
 
 def set_session(user_id):
@@ -86,7 +86,7 @@ def register():
     Reads `username` and `password` from POST form data.
     
     Returns:
-        Redirects to login on success or re-renders the index with an error.
+        Redirects to sign-in on success or re-renders the index with an error.
     """
     if request.method == "POST":
         username = request.form["username"]
@@ -95,7 +95,7 @@ def register():
         # User did not provide a username and/or password
         if username == "" or password == "":
             return render_template(
-                "index.html", message="Please enter required fields"
+                "home.html", message="Please enter required fields"
             )
 
         # Username already exists in database
@@ -105,7 +105,7 @@ def register():
         ).fetchone()
         if userDB:
             return render_template(
-                "index.html",
+                "home.html",
                 message="Username is already taken - please select a different one",
             )
 
@@ -122,18 +122,18 @@ def register():
         return redirect(url_for("signin"))
 
 
-@app.route("/login", methods=["GET"])
+@app.route("/sign-in", methods=["GET"])
 def signin():
     """
-    Render the login page.
+    Render the sign-in page.
 
     Returns:
-        Rendered HTML response for the login page.
+        Rendered HTML response for the sign-in page.
     """
-    return render_template("login.html")
+    return render_template("sign-in.html")
 
 
-@app.route("/signin", methods=["POST"])
+@app.route("/sign-in", methods=["POST"])
 def login():
     """
     Authenticate a user and start a session.
@@ -141,7 +141,7 @@ def login():
     Reads `username` and `password` from POST form data.
 
     Returns:
-        Redirects to search on success or re-renders login with an error.
+        Redirects to search on success or re-renders sign-in with an error.
     """
     if request.method == "POST":
         username = request.form["username"]
@@ -150,7 +150,7 @@ def login():
         # Username and/or password is missing
         if username == "" or password == "":
             return render_template(
-                "login.html", message="Username and/or password is incorrect"
+                "sign-in.html", message="Username and/or password is incorrect"
             )
 
         # Checks if username exists, then validates password hash
@@ -159,11 +159,11 @@ def login():
             {"username": username},
         ).fetchone()
         if userInfo and check_password_hash(userInfo[1], password):
-            set_session(userInfo[0])  # Remembers user when they log in
+            set_session(userInfo[0])  # Remembers user when they sign in
             return redirect(url_for("search"))
 
         return render_template(
-            "login.html", message="Username and/or password is incorrect"
+            "sign-in.html", message="Username and/or password is incorrect"
         )
 
 
@@ -241,7 +241,7 @@ def search():
     return render_template("search.html")
 
 
-@app.route("/returnToSearch", methods=["GET", "POST"])
+@app.route("/return-to-search", methods=["GET", "POST"])
 def return_to_search():
     """
     Return the user to the search page.
@@ -253,7 +253,7 @@ def return_to_search():
 
 
 # Extracts information on the user's desired book and outputs it on book page
-@app.route("/view", methods=["POST"])
+@app.route("/book", methods=["POST"])
 def view():
     """
     Render the book detail page for a selected book.
@@ -278,7 +278,7 @@ def view():
         return render_template("search.html", message="Book not found")
 
     return render_template(
-        "book.html",
+        "book-detail.html",
         isbn=isbn,
         **context,
     )
@@ -298,7 +298,7 @@ def review():
         id = get_session()
         if id is None:
             return render_template(
-                "login.html", message="Please log in to submit a review"
+                "sign-in.html", message="Please sign in to submit a review"
             )
         isbn = request.form.get("isbn", "").strip()
         review = request.form.get("review", "").strip()
@@ -313,7 +313,7 @@ def review():
             if not context:
                 return render_template("search.html", message="Book not found")
             return render_template(
-                "book.html",
+                "book-detail.html",
                 isbn=isbn,
                 review_error="Please provide a rating and review",
                 **context,
@@ -329,7 +329,7 @@ def review():
             if not context:
                 return render_template("search.html", message="Book not found")
             return render_template(
-                "book.html",
+                "book-detail.html",
                 isbn=isbn,
                 review_error=(
                     "Unable to submit review - you have already completed a review for this book"
@@ -355,7 +355,7 @@ def review():
             )
 
 
-@app.route("/message")
+@app.route("/status")
 def message():
     """
     Render a status message page.
@@ -367,10 +367,10 @@ def message():
     """
     success = request.args.get("success")
     error = request.args.get("error")
-    return render_template("message.html", success=success, error=error)
+    return render_template("status.html", success=success, error=error)
 
 
-@app.route("/api/<isbn>")
+@app.route("/api/books/<isbn>")
 def api_info(isbn):
     """
     Render a page with book info from the Google Books API.
@@ -394,10 +394,10 @@ def api_info(isbn):
             book_data = None
 
         if book_data and book_data.get("error"):
-            return render_template("api.html", error=book_data["error"])
+            return render_template("book-api.html", error=book_data["error"])
         if book_data:
-            return render_template("api.html", book_data=book_data)
-        return render_template("api.html", error="Unable to fetch book details")
+            return render_template("book-api.html", book_data=book_data)
+        return render_template("book-api.html", error="Unable to fetch book details")
     else:
-        error = "404 Error - The requested URL /api/" + isbn + " was not found on this server"
-        return render_template("api.html", error=error), 404
+        error = "404 Error - The requested URL /api/books/" + isbn + " was not found on this server"
+        return render_template("book-api.html", error=error), 404

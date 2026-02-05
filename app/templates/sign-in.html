@@ -20,14 +20,14 @@
 </header>
 
 <section class="card" style="max-width: 520px; --delay: 0.08s;">
-  <h2>Log In</h2>
+  <h2>Sign In</h2>
   <p class="muted">Access your reviews and start exploring new titles.</p>
 
   {% if message %}
     <div class="alert">{{ message }}</div>
   {% endif %}
 
-  <form class="stack" action="/signin" method="POST">
+  <form class="stack" action="/sign-in" method="POST">
     <div class="field">
       <label for="username">Username</label>
       <input class="input" type="text" id="username" name="username">
@@ -36,7 +36,7 @@
       <label for="password">Password</label>
       <input class="input" type="password" id="password" name="password">
     </div>
-    <button class="btn" type="submit">Log in</button>
+    <button class="btn" type="submit">Sign in</button>
   </form>
 </section>
 

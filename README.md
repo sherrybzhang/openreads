@@ -1,9 +1,9 @@
 # OpenReads
 
-OpenReads is a simple book review web application that lets users create accounts, search for books, view book details, and submit reviews. It also supports a JSON-style response via `/api/<isbn>` using the Google Books API.
+OpenReads is a book review web application that lets users create accounts, search for books, view book details, and submit reviews. It also supports a JSON-style response via `/api/books/<isbn>` using the Google Books API.
 
 ## Features
-- User registration and login
+- User registration and sign in
 - Search by ISBN, title, or author
 - Book detail page with external ratings
 - One review per user per book
@@ -11,7 +11,7 @@ OpenReads is a simple book review web application that lets users create account
 
 ## Technologies
 - **Languages:** Python, SQL, HTML, CSS
-- **Frameworks/Libraries:** Flask, SQLAlchemy, Bootstrap
+- **Frameworks/Libraries:** Flask, Flask-Session, SQLAlchemy, Bootstrap
 - **Database:** PostgreSQL
 - **API:** Google Books API
 
@@ -21,7 +21,7 @@ OpenReads is a simple book review web application that lets users create account
 ```
 pip install -r requirements.txt
 ```
-3) Set environment variables (optional defaults are provided in `app/config.py`):
+3) Set environment variables (optional defaults are provided in `app/config.py` and loaded via `python-dotenv`):
 ```
 export SECRET_KEY="your-secret"
 export DATABASE_URL="postgresql://localhost/your_db"
@@ -38,13 +38,12 @@ python scripts/import_books.py
 ```
 python application.py
 ```
+7) Open the app in your browser:
+```
+http://localhost:8080
+```
 
 ## Tests
 ```
 pytest
-```
-
-## Formatting
-```
-./scripts/format.sh
 ```
