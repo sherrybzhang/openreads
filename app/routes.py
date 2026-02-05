@@ -6,22 +6,48 @@ from flask import render_template, request, session, redirect, url_for
 from sqlalchemy.sql import text
 from werkzeug.security import check_password_hash, generate_password_hash
 
-# Routes to home page
+
 @app.route("/")
 def index():
+    """
+    Render the home page.
+
+    Returns:
+        Rendered HTML response for the index page.
+    """
     return render_template("index.html")
 
 
-# Session helpers
 def set_session(user_id):
+    """
+    Persist the logged-in user id in the session.
+
+    Args:
+        user_id: The authenticated user's id.
+    """
     session["id"] = user_id
 
 
 def get_session():
+    """
+    Retrieve the logged-in user id from the session.
+
+    Returns:
+        The user id if present; otherwise None.
+    """
     return session.get("id")
 
 
 def build_book_context(isbn):
+    """
+    Build the template context for a book detail page.
+
+    Args:
+        isbn: The ISBN string to query.
+
+    Returns:
+        A dict of book context values, or None if the book is not found.
+    """
     book_row = db.execute(
         text("SELECT title, author, year FROM books WHERE isbn = :isbn"),
         {"isbn": isbn},
@@ -52,9 +78,16 @@ def build_book_context(isbn):
     }
 
 
-# Handles user registrations
 @app.route("/register", methods=["POST"])
 def register():
+    """
+    Handle user registration.
+    
+    Reads `username` and `password` from POST form data.
+    
+    Returns:
+        Redirects to login on success or re-renders the index with an error.
+    """
     if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"]
@@ -89,15 +122,27 @@ def register():
         return redirect(url_for("signin"))
 
 
-# LOGIN option on home page that routes to login page. Used by users that already have an account
 @app.route("/login", methods=["GET"])
 def signin():
+    """
+    Render the login page.
+
+    Returns:
+        Rendered HTML response for the login page.
+    """
     return render_template("login.html")
 
 
-# Logs in the user, begins user session, and redirects to search page
 @app.route("/signin", methods=["POST"])
 def login():
+    """
+    Authenticate a user and start a session.
+
+    Reads `username` and `password` from POST form data.
+
+    Returns:
+        Redirects to search on success or re-renders login with an error.
+    """
     if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"]
@@ -122,17 +167,29 @@ def login():
         )
 
 
-# Logs user out and ends session
 @app.route("/logout", methods=["POST"])
 def logout():
+    """
+    Log out the current user.
+
+    Returns:
+        Redirects to the home page.
+    """
     if request.method == "POST":
         session.pop("id", None)  # Ends user session
         return redirect(url_for("index"))
 
 
-# Performs book search
 @app.route("/search", methods=["GET", "POST"])
 def search():
+    """
+    Search for books by ISBN, title, or author.
+
+    Reads `isbn`, `title`, and `author` from form data.
+
+    Returns:
+        Rendered search results or a validation message.
+    """
     if request.method == "POST":
         isbn = request.form["isbn"].strip()
         title = request.form["title"].strip()
@@ -185,13 +242,27 @@ def search():
 
 
 @app.route("/returnToSearch", methods=["GET", "POST"])
-def returntoSearch():
+def return_to_search():
+    """
+    Return the user to the search page.
+
+    Returns:
+        Rendered HTML response for the search page.
+    """
     return render_template("search.html")
 
 
 # Extracts information on the user's desired book and outputs it on book page
 @app.route("/view", methods=["POST"])
 def view():
+    """
+    Render the book detail page for a selected book.
+
+    Reads `book` (ISBN) from POST form data.
+
+    Returns:
+        Rendered book detail page or a validation error.
+    """
     # User hits 'View Book' button before completing a search
     try:
         isbn = request.form["book"]
@@ -215,6 +286,14 @@ def view():
 
 @app.route("/review", methods=["POST"])
 def review():
+    """
+    Submit a review for a book.
+
+    Reads `isbn`, `rating`, and `review` from POST form data.
+
+    Returns:
+        Rendered book page with errors, or a redirect on success.
+    """
     if request.method == "POST":
         id = get_session()
         if id is None:
@@ -278,14 +357,30 @@ def review():
 
 @app.route("/message")
 def message():
+    """
+    Render a status message page.
+
+    Reads `success` and `error` from query parameters.
+
+    Returns:
+        Rendered HTML response for the message page.
+    """
     success = request.args.get("success")
     error = request.args.get("error")
     return render_template("message.html", success=success, error=error)
 
 
-# Redirects user to a new page containing book information pulled from Google Books API
 @app.route("/api/<isbn>")
-def apiInfo(isbn):
+def api_info(isbn):
+    """
+    Render a page with book info from the Google Books API.
+
+    Args:
+        isbn: The ISBN string provided in the URL.
+
+    Returns:
+        Rendered HTML response with book data or error.
+    """
     # Check to see if ISBN exists in database
     checkISBN = db.execute(
         text("SELECT isbn FROM books WHERE isbn = :isbn"), {"isbn": isbn}
