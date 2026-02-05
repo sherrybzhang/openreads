@@ -21,6 +21,7 @@ instance/
 # Flask
 *.log
 flask_session/
+flask_session_data/
 
 # Tests/coverage
 .pytest_cache/
