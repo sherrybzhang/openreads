@@ -86,7 +86,7 @@ def register():
     Reads `username` and `password` from POST form data.
     
     Returns:
-        Redirects to login on success or re-renders the index with an error.
+        Redirects to sign-in on success or re-renders the index with an error.
     """
     if request.method == "POST":
         username = request.form["username"]
@@ -122,13 +122,13 @@ def register():
         return redirect(url_for("signin"))
 
 
-@app.route("/login", methods=["GET"])
+@app.route("/sign-in", methods=["GET"])
 def signin():
     """
-    Render the login page.
+    Render the sign-in page.
 
     Returns:
-        Rendered HTML response for the login page.
+        Rendered HTML response for the sign-in page.
     """
     return render_template("sign-in.html")
 
@@ -141,7 +141,7 @@ def login():
     Reads `username` and `password` from POST form data.
 
     Returns:
-        Redirects to search on success or re-renders login with an error.
+        Redirects to search on success or re-renders sign-in with an error.
     """
     if request.method == "POST":
         username = request.form["username"]
@@ -159,7 +159,7 @@ def login():
             {"username": username},
         ).fetchone()
         if userInfo and check_password_hash(userInfo[1], password):
-            set_session(userInfo[0])  # Remembers user when they log in
+            set_session(userInfo[0])  # Remembers user when they sign in
             return redirect(url_for("search"))
 
         return render_template(
@@ -298,7 +298,7 @@ def review():
         id = get_session()
         if id is None:
             return render_template(
-                "sign-in.html", message="Please log in to submit a review"
+                "sign-in.html", message="Please sign in to submit a review"
             )
         isbn = request.form.get("isbn", "").strip()
         review = request.form.get("review", "").strip()
