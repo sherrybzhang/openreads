@@ -1,6 +1,6 @@
 # OpenReads
 
-OpenReads is a simple book review web application that lets users create accounts, search for books, view book details, and submit reviews. It also supports a JSON-style response via `/api/<isbn>` using the Google Books API.
+OpenReads is a simple book review web application that lets users create accounts, search for books, view book details, and submit reviews. It also supports a JSON-style response via `/api/books/<isbn>` using the Google Books API.
 
 ## Features
 - User registration and login
