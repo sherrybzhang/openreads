@@ -6,24 +6,88 @@ from flask import render_template, request, session, redirect, url_for
 from sqlalchemy.sql import text
 from werkzeug.security import check_password_hash, generate_password_hash
 
-# Routes to home page
+
 @app.route("/")
 def index():
+    """
+    Render the home page.
+
+    Returns:
+        Rendered HTML response for the index page.
+    """
     return render_template("index.html")
 
 
-# Session helpers
 def set_session(user_id):
+    """
+    Persist the logged-in user id in the session.
+
+    Args:
+        user_id: The authenticated user's id.
+    """
     session["id"] = user_id
 
 
 def get_session():
+    """
+    Retrieve the logged-in user id from the session.
+
+    Returns:
+        The user id if present; otherwise None.
+    """
     return session.get("id")
 
 
-# Handles user registrations
+def build_book_context(isbn):
+    """
+    Build the template context for a book detail page.
+
+    Args:
+        isbn: The ISBN string to query.
+
+    Returns:
+        A dict of book context values, or None if the book is not found.
+    """
+    book_row = db.execute(
+        text("SELECT title, author, year FROM books WHERE isbn = :isbn"),
+        {"isbn": isbn},
+    ).fetchone()
+    if not book_row:
+        return None
+
+    title, author, year = book_row
+    averageRating = retrieve_book(isbn, BookQuery.AVERAGE_RATING)
+    numberOfRating = retrieve_book(isbn, BookQuery.NUMBER_OF_RATING)
+    reviews = db.execute(
+        text("SELECT * FROM reviews WHERE isbn = :isbn"), {"isbn": isbn}
+    ).fetchall()
+    localReviewCount = len(reviews)
+    localAverageRating = db.execute(
+        text("SELECT AVG(rating) FROM reviews WHERE isbn = :isbn"), {"isbn": isbn}
+    ).fetchone()[0]
+
+    return {
+        "title": title,
+        "author": author,
+        "year": year,
+        "averageRating": averageRating,
+        "numberOfRating": numberOfRating,
+        "reviews": reviews,
+        "localReviewCount": localReviewCount,
+        "localAverageRating": localAverageRating,
+    }
+
+
 @app.route("/register", methods=["POST"])
 def register():
+    """
+    Handle user registration.
+    
+    Reads `username` and `password` from POST form data.
+    
+    Returns:
+        Redirects to login on success or re-renders the index with an error.
+    """
     if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"]
@@ -55,20 +119,30 @@ def register():
         )
         db.commit()
 
-        return render_template("login.html")
+        return redirect(url_for("signin"))
 
 
-# LOGIN option on home page that routes to login page. Used by users that already have an account
-@app.route("/login", methods=["GET", "POST"])
+@app.route("/login", methods=["GET"])
 def signin():
-    if request.method == "POST":
-        return render_template("login.html")
+    """
+    Render the login page.
+
+    Returns:
+        Rendered HTML response for the login page.
+    """
     return render_template("login.html")
 
 
-# Logs in the user, begins user session, and redirects to search page
 @app.route("/signin", methods=["POST"])
 def login():
+    """
+    Authenticate a user and start a session.
+
+    Reads `username` and `password` from POST form data.
+
+    Returns:
+        Redirects to search on success or re-renders login with an error.
+    """
     if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"]
@@ -86,24 +160,36 @@ def login():
         ).fetchone()
         if userInfo and check_password_hash(userInfo[1], password):
             set_session(userInfo[0])  # Remembers user when they log in
-            return render_template("search.html")
+            return redirect(url_for("search"))
 
         return render_template(
             "login.html", message="* Username and/or password is incorrect"
         )
 
 
-# Logs user out and ends session
 @app.route("/logout", methods=["POST"])
 def logout():
+    """
+    Log out the current user.
+
+    Returns:
+        Redirects to the home page.
+    """
     if request.method == "POST":
         session.pop("id", None)  # Ends user session
         return redirect(url_for("index"))
 
 
-# Performs book search
 @app.route("/search", methods=["GET", "POST"])
 def search():
+    """
+    Search for books by ISBN, title, or author.
+
+    Reads `isbn`, `title`, and `author` from form data.
+
+    Returns:
+        Rendered search results or a validation message.
+    """
     if request.method == "POST":
         isbn = request.form["isbn"].strip()
         title = request.form["title"].strip()
@@ -134,87 +220,104 @@ def search():
         # Search by Author
         elif author and isbn == "" and title == "":
             books = db.execute(
-                text("SELECT * FROM books WHERE author LIKE :author"),
-                {"author": author + "%"},
+                text("SELECT * FROM books WHERE author ILIKE :author"),
+                {"author": f"%{author}%"},
             ).fetchall()
             if books:
                 return render_template("search.html", books=books)
             else:
                 return render_template("search.html", message="* No matches were found")
 
-        else:
+        if not isbn and not title and not author:
             return render_template(
-                "search.html", message="* Please fill out at most one field below"
+                "search.html", message="* Please fill out at least one field below"
             )
+
+        return render_template(
+            "search.html", message="* Please fill out at most one field below"
+        )
 
     # Returns user to search page
     return render_template("search.html")
 
 
 @app.route("/returnToSearch", methods=["GET", "POST"])
-def returntoSearch():
+def return_to_search():
+    """
+    Return the user to the search page.
+
+    Returns:
+        Rendered HTML response for the search page.
+    """
     return render_template("search.html")
 
 
 # Extracts information on the user's desired book and outputs it on book page
-@app.route("/view", methods=["GET", "POST"])
+@app.route("/view", methods=["POST"])
 def view():
-    if request.method == "POST":
-        # User hits 'View Book' button before completing a search
-        try:
-            isbn = request.form["book"]
-        except KeyError:
-            return render_template(
-                "search.html",
-                message="* Please enter a book ISBN, title, or author first",
-            )
+    """
+    Render the book detail page for a selected book.
 
-        # Selecting desired information from 'books' table in database
-        title = db.execute(
-            text("SELECT title FROM books WHERE isbn = :isbn"), {"isbn": isbn}
-        ).fetchone()[0]
-        author = db.execute(
-            text("SELECT author FROM books WHERE isbn = :isbn"), {"isbn": isbn}
-        ).fetchone()[0]
-        year = db.execute(
-            text("SELECT year FROM books WHERE isbn = :isbn"), {"isbn": isbn}
-        ).fetchone()[0]
-        averageRating = retrieve_book(isbn, BookQuery.AVERAGE_RATING)
-        numberOfRating = retrieve_book(isbn, BookQuery.NUMBER_OF_RATING)
-        reviews = db.execute(
-            text("SELECT * FROM reviews WHERE isbn = :isbn"), {"isbn": isbn}
-        ).fetchall()
-        localReviewCount = len(reviews)
-        localAverageRating = db.execute(
-            text("SELECT AVG(rating) FROM reviews WHERE isbn = :isbn"), {"isbn": isbn}
-        ).fetchone()[0]
+    Reads `book` (ISBN) from POST form data.
 
+    Returns:
+        Rendered book detail page or a validation error.
+    """
+    # User hits 'View Book' button before completing a search
+    try:
+        isbn = request.form["book"]
+    except KeyError:
         return render_template(
-            "book.html",
-            isbn=isbn,
-            title=title,
-            author=author,
-            year=year,
-            averageRating=averageRating,
-            numberOfRating=numberOfRating,
-            localReviewCount=localReviewCount,
-            localAverageRating=localAverageRating,
-            reviews=reviews,
+            "search.html",
+            message="* Please enter a book ISBN, title, or author first",
         )
 
-    # Submits user's book review
+    # Selecting desired information from 'books' table in database
+    context = build_book_context(isbn)
+    if not context:
+        return render_template("search.html", message="* Book not found")
+
     return render_template(
-        "search.html", message="* Please enter a book ISBN, title, or author first"
+        "book.html",
+        isbn=isbn,
+        **context,
     )
 
 
 @app.route("/review", methods=["POST"])
 def review():
+    """
+    Submit a review for a book.
+
+    Reads `isbn`, `rating`, and `review` from POST form data.
+
+    Returns:
+        Rendered book page with errors, or a redirect on success.
+    """
     if request.method == "POST":
         id = get_session()
-        isbn = request.form["isbn"]
-        review = request.form["review"]
-        rating = request.form["rating"]
+        if id is None:
+            return render_template(
+                "login.html", message="* Please log in to submit a review"
+            )
+        isbn = request.form.get("isbn", "").strip()
+        review = request.form.get("review", "").strip()
+        rating = request.form.get("rating", "").strip()
+        if not isbn or not review or not rating:
+            if not isbn:
+                return render_template(
+                    "search.html",
+                    message="* Please enter a book ISBN, title, or author first",
+                )
+            context = build_book_context(isbn)
+            if not context:
+                return render_template("search.html", message="* Book not found")
+            return render_template(
+                "book.html",
+                isbn=isbn,
+                review_error="Please provide a rating and review.",
+                **context,
+            )
 
         # User already has existing review for the book
         existingReviewCheck = db.execute(
@@ -222,9 +325,16 @@ def review():
             {"id": id, "isbn": isbn},
         ).fetchone()
         if existingReviewCheck:
+            context = build_book_context(isbn)
+            if not context:
+                return render_template("search.html", message="* Book not found")
             return render_template(
-                "message.html",
-                error="Unable to submit review. You have already completed a review for this book.",
+                "book.html",
+                isbn=isbn,
+                review_error=(
+                    "Unable to submit review. You have already completed a review for this book."
+                ),
+                **context,
             )
 
         # Creating new review
@@ -237,14 +347,40 @@ def review():
             )
             db.commit()
 
-            return render_template(
-                "message.html", success="Your review has been successfully submitted!"
+            return redirect(
+                url_for(
+                    "message",
+                    success="Your review has been successfully submitted!",
+                )
             )
 
 
-# Redirects user to a new page containing book information pulled from Google Books API
+@app.route("/message")
+def message():
+    """
+    Render a status message page.
+
+    Reads `success` and `error` from query parameters.
+
+    Returns:
+        Rendered HTML response for the message page.
+    """
+    success = request.args.get("success")
+    error = request.args.get("error")
+    return render_template("message.html", success=success, error=error)
+
+
 @app.route("/api/<isbn>")
-def apiInfo(isbn):
+def api_info(isbn):
+    """
+    Render a page with book info from the Google Books API.
+
+    Args:
+        isbn: The ISBN string provided in the URL.
+
+    Returns:
+        Rendered HTML response with book data or error.
+    """
     # Check to see if ISBN exists in database
     checkISBN = db.execute(
         text("SELECT isbn FROM books WHERE isbn = :isbn"), {"isbn": isbn}
@@ -268,4 +404,4 @@ def apiInfo(isbn):
             + isbn
             + " was not found on this server."
         )
-        return render_template("api.html", error=error)
+        return render_template("api.html", error=error), 404
