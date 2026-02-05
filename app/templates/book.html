@@ -64,6 +64,9 @@
 <section class="grid-2" style="margin-top: 24px;">
   <div class="card" style="--delay: 0.12s;">
     <h3>Write a Review</h3>
+    {% if review_error %}
+      <div class="alert" style="margin-top: 12px;">{{ review_error }}</div>
+    {% endif %}
     <form class="stack" action="/review" method="POST">
       <div class="field">
         <label for="rating">Rating</label>
