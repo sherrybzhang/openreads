@@ -2,7 +2,7 @@ import json
 
 from app import app, db
 from app.services.google_books import BookQuery, retrieve_book
-from flask import render_template, request, session, redirect, url_for
+from flask import render_template, request, session, redirect, url_for, g
 from sqlalchemy.sql import text
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -36,6 +36,58 @@ def get_session():
         The user id if present; otherwise None.
     """
     return session.get("id")
+
+
+def build_initials(username):
+    """
+    Build a short initials string from the username.
+    """
+    if not username:
+        return "U"
+    trimmed = username.strip()
+    if not trimmed:
+        return "U"
+    parts = [part for part in trimmed.split() if part]
+    if not parts:
+        return trimmed[0].upper()
+    initials = "".join(part[0].upper() for part in parts)
+    return initials[:2]
+
+
+def load_current_user():
+    """
+    Load the current user for the active session.
+
+    Returns:
+        A dict with user data, or None if not authenticated.
+    """
+    if hasattr(g, "current_user"):
+        return g.current_user
+    user_id = get_session()
+    if user_id is None:
+        g.current_user = None
+        return g.current_user
+    user_row = db.execute(
+        text("SELECT id, username FROM users WHERE id = :id"),
+        {"id": user_id},
+    ).fetchone()
+    if not user_row:
+        g.current_user = None
+        return g.current_user
+    g.current_user = {
+        "id": user_row[0],
+        "username": user_row[1],
+        "initials": build_initials(user_row[1]),
+    }
+    return g.current_user
+
+
+@app.context_processor
+def inject_current_user():
+    """
+    Expose the current user to templates.
+    """
+    return {"current_user": load_current_user()}
 
 
 def build_book_context(isbn):
@@ -178,6 +230,68 @@ def logout():
     if request.method == "POST":
         session.pop("id", None)  # Ends user session
         return redirect(url_for("index"))
+
+
+@app.route("/profile")
+def profile():
+    """
+    Render the user profile page.
+
+    Returns:
+        Rendered HTML response for the profile page.
+    """
+    current_user = load_current_user()
+    if current_user is None:
+        session.pop("id", None)
+        return render_template("sign-in.html", message="Please sign in to view your profile")
+    user_id = current_user["id"]
+
+    stats = db.execute(
+        text("SELECT COUNT(*) AS total, AVG(rating) AS avg_rating FROM reviews WHERE id = :id"),
+        {"id": user_id},
+    ).fetchone()
+    review_total = stats[0] if stats else 0
+    average_rating = stats[1] if stats else None
+
+    recent_rows = db.execute(
+        text(
+            """
+            SELECT b.title, b.author, r.rating, r.review, r.created_at
+            FROM reviews r
+            JOIN books b ON r.isbn = b.isbn
+            WHERE r.id = :id
+            ORDER BY r.created_at DESC
+            LIMIT 5
+            """
+        ),
+        {"id": user_id},
+    ).fetchall()
+
+    recent_reviews = []
+    for row in recent_rows:
+        created_at = row[4]
+        if hasattr(created_at, "strftime"):
+            created_label = created_at.strftime("%b %d, %Y")
+        elif created_at:
+            created_label = str(created_at).split(" ")[0]
+        else:
+            created_label = ""
+        recent_reviews.append(
+            {
+                "title": row[0],
+                "author": row[1],
+                "rating": row[2],
+                "review": row[3],
+                "created_at": created_label,
+            }
+        )
+
+    return render_template(
+        "profile.html",
+        review_total=review_total,
+        average_rating=average_rating,
+        recent_reviews=recent_reviews,
+    )
 
 
 @app.route("/search", methods=["GET", "POST"])

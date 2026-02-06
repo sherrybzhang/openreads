@@ -10,9 +10,16 @@
       <p class="brand-tag">API response</p>
     </div>
   </div>
-  <form action="/logout" method="POST">
-    <button class="btn btn-ghost" type="submit">Logout</button>
-  </form>
+  {% if current_user %}
+    <div class="header-actions">
+      <a class="profile-icon" href="{{ url_for('profile') }}" aria-label="Profile">
+        {{ current_user.initials }}
+      </a>
+      <form action="/logout" method="POST">
+        <button class="btn btn-ghost" type="submit">Logout</button>
+      </form>
+    </div>
+  {% endif %}
 </header>
 
 <section class="card" style="--delay: 0.08s">
