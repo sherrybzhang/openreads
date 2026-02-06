@@ -6,6 +6,7 @@ OpenReads is a book review web application that lets users create accounts, sear
 - User registration and sign in
 - Search by ISBN, title, or author
 - Book detail page with external ratings
+- Profile page with review summary and recent activity
 - One review per user per book
 - API route for book info
 
