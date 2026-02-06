@@ -17,7 +17,7 @@
   {% if current_user %}
     <div class="header-actions">
       <a class="profile-icon" href="{{ url_for('profile') }}" aria-label="Profile">
-        {{ current_user.initials }}
+        <img src="{{ url_for('static', filename='profile.png') }}" alt="Profile">
       </a>
       <form action="/logout" method="POST">
         <button class="btn btn-ghost" type="submit">Logout</button>

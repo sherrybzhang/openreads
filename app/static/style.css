@@ -159,16 +159,19 @@ p {
   place-items: center;
   font-weight: 700;
   color: var(--accent-strong);
-  border: 1px solid rgba(213, 229, 255, 0.5);
 }
 
 .profile-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
+  width: 35px;
+  height: 35px;
   font-size: 0.95rem;
   text-decoration: none;
-  background: rgba(255, 255, 255, 0.55);
+}
+
+.profile-icon img {
+  width: 37px;
+  height: 37px;
+  display: block;
 }
 
 .profile-icon:focus-visible {
@@ -177,8 +180,7 @@ p {
 }
 
 .profile-icon:hover {
-  background: var(--surface-2);
-  border-color: rgba(61, 132, 255, 0.35);
+  opacity: 0.85;
 }
 
 .profile-avatar {
