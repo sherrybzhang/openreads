@@ -105,10 +105,26 @@ p {
   gap: 12px;
 }
 
+.header-actions .btn-ghost {
+  height: 40px;
+  padding: 0 16px;
+}
+
 .brand {
   display: flex;
   align-items: center;
   gap: 14px;
+}
+
+.brand-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.brand-link:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--ring);
+  border-radius: 16px;
 }
 
 .brand-mark {
@@ -143,22 +159,28 @@ p {
   place-items: center;
   font-weight: 700;
   color: var(--accent-strong);
-  background: linear-gradient(135deg, #eaf3ff, #cfe4ff);
-  border: 1px solid var(--border);
-  box-shadow: 0 8px 18px rgba(61, 132, 255, 0.18);
 }
 
 .profile-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 14px;
+  width: 35px;
+  height: 35px;
   font-size: 0.95rem;
   text-decoration: none;
+}
+
+.profile-icon img {
+  width: 37px;
+  height: 37px;
+  display: block;
 }
 
 .profile-icon:focus-visible {
   outline: none;
   box-shadow: 0 0 0 3px var(--ring);
+}
+
+.profile-icon:hover {
+  opacity: 0.85;
 }
 
 .profile-avatar {
@@ -284,9 +306,9 @@ textarea:focus {
 }
 
 .btn-ghost {
-  background: transparent;
+  background: rgba(255, 255, 255, 0.35);
   color: var(--accent-strong);
-  border: 1px solid var(--border);
+  border: 1px solid rgba(213, 229, 255, 0.5);
   box-shadow: none;
 }
 

@@ -7,17 +7,17 @@
 
 {% block body %}
 <header class="site-header">
-  <div class="brand">
+  <a class="brand brand-link" href="{{ url_for('search') if current_user else url_for('index') }}">
     <div class="brand-mark">OR</div>
     <div>
       <div class="brand-name">OpenReads</div>
       <p class="brand-tag">Book details</p>
     </div>
-  </div>
+  </a>
   {% if current_user %}
     <div class="header-actions">
       <a class="profile-icon" href="{{ url_for('profile') }}" aria-label="Profile">
-        {{ current_user.initials }}
+        <img src="{{ url_for('static', filename='profile.png') }}" alt="Profile">
       </a>
       <form action="/logout" method="POST">
         <button class="btn btn-ghost" type="submit">Logout</button>
