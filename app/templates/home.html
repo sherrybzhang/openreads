@@ -8,13 +8,13 @@
 {% block body %}
 <section class="hero">
   <div class="hero-copy">
-    <div class="brand">
+    <a class="brand brand-link" href="{{ url_for('search') if current_user else url_for('index') }}">
       <div class="brand-mark">OR</div>
       <div>
         <div class="brand-name">OpenReads</div>
         <p class="brand-tag">Thoughtful reviews, curated reads</p>
       </div>
-    </div>
+    </a>
     <h2 style="margin-top: 15px;">Discover your next favorite book today</h2>
     <p class="muted">
       OpenReads is a welcoming place to discover titles, compare ratings, and leave
