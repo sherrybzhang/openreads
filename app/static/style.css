@@ -111,6 +111,17 @@ p {
   gap: 14px;
 }
 
+.brand-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.brand-link:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--ring);
+  border-radius: 16px;
+}
+
 .brand-mark {
   width: 44px;
   height: 44px;

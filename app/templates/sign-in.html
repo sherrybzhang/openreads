@@ -7,13 +7,13 @@
 
 {% block body %}
 <header class="site-header">
-  <div class="brand">
+  <a class="brand brand-link" href="{{ url_for('search') if current_user else url_for('index') }}">
     <div class="brand-mark">OR</div>
     <div>
       <div class="brand-name">OpenReads</div>
       <p class="brand-tag">Welcome back</p>
     </div>
-  </div>
+  </a>
   <form action="/logout" method="POST">
     <button class="btn btn-ghost" type="submit">Home</button>
   </form>
