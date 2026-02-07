@@ -32,10 +32,6 @@
 
   <div class="spec-grid">
     <div class="spec">
-      <span class="spec-label">ISBN</span>
-      <span>{{ isbn }}</span>
-    </div>
-    <div class="spec">
       <span class="spec-label">Author</span>
       <span>{{ author }}</span>
     </div>
@@ -44,12 +40,8 @@
       <span>{{ year }}</span>
     </div>
     <div class="spec">
-      <span class="spec-label">Average Rating</span>
-      <span>{{ averageRating if averageRating is not none else "Unavailable" }}</span>
-    </div>
-    <div class="spec">
-      <span class="spec-label">Google Ratings</span>
-      <span>{{ numberOfRating if numberOfRating is not none else "0" }}</span>
+      <span class="spec-label">ISBN</span>
+      <span>{{ isbn }}</span>
     </div>
     <div class="spec">
       <span class="spec-label">OpenReads Avg Rating</span>
@@ -102,7 +94,13 @@
       <div class="stack">
         {% for review in reviews %}
           <div class="spec">
-            {{ review.review }}
+            <div style="font-weight: 600;">{{ review.username }}</div>
+            <div class="muted" style="font-size: 0.9rem;">
+              Rating: {{ review.rating }} / 5
+            </div>
+            {% if review.review %}
+              <p class="review-text">{{ review.review }}</p>
+            {% endif %}
           </div>
         {% endfor %}
       </div>

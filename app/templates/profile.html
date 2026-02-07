@@ -59,12 +59,12 @@
         {% for review in recent_reviews %}
           <div class="spec">
             <strong>{{ review.title }}</strong>
-            <div class="muted">{{ review.author }} · Rated {{ review.rating }} / 5</div>
+            <div class="muted">{{ review.author }} · Rating: {{ review.rating }} / 5</div>
             {% if review.review %}
-              <p style="margin-top: 8px;">{{ review.review }}</p>
+              <p>{{ review.review }}</p>
             {% endif %}
             {% if review.created_at %}
-              <div class="muted" style="font-size: 0.85rem; margin-top: 8px;">{{ review.created_at }}</div>
+              <div class="muted" style="font-size: 0.85rem; margin-top: -12px">{{ review.created_at }}</div>
             {% endif %}
           </div>
         {% endfor %}
