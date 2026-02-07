@@ -68,15 +68,18 @@
     {% endif %}
     <form class="stack" action="/review" method="POST">
       <div class="field">
-        <label for="rating">Rating</label>
-        <div class="select">
-          <select id="rating" name="rating">
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-          </select>
+        <label id="rating-label" for="rating-5">Rating</label>
+        <div class="star-rating" role="radiogroup" aria-labelledby="rating-label">
+          <input id="rating-5" type="radio" name="rating" value="5">
+          <label for="rating-5" title="5 stars">★</label>
+          <input id="rating-4" type="radio" name="rating" value="4">
+          <label for="rating-4" title="4 stars">★</label>
+          <input id="rating-3" type="radio" name="rating" value="3">
+          <label for="rating-3" title="3 stars">★</label>
+          <input id="rating-2" type="radio" name="rating" value="2">
+          <label for="rating-2" title="2 stars">★</label>
+          <input id="rating-1" type="radio" name="rating" value="1">
+          <label for="rating-1" title="1 star">★</label>
         </div>
       </div>
       <div class="field">

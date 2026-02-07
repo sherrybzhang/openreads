@@ -391,6 +391,42 @@ textarea:focus {
   transition: transform 0.2s ease, border-color 0.2s ease;
 }
 
+.star-rating {
+  display: inline-flex;
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+  justify-self: start;
+  gap: 6px;
+  font-size: 1.6rem;
+}
+
+.star-rating input {
+  position: absolute;
+  opacity: 0;
+}
+
+.star-rating label {
+  color: #c6d8f7;
+  cursor: pointer;
+  transition: transform 0.15s ease, color 0.15s ease;
+}
+
+.star-rating label:hover,
+.star-rating label:hover ~ label {
+  color: var(--accent-strong);
+}
+
+.star-rating input:checked ~ label {
+  color: var(--accent);
+}
+
+.star-rating label:focus-visible,
+.star-rating input:focus-visible + label {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--ring);
+  border-radius: 6px;
+}
+
 .spec-label {
   font-size: 0.8rem;
   text-transform: uppercase;
