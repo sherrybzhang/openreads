@@ -44,14 +44,6 @@
       <span>{{ year }}</span>
     </div>
     <div class="spec">
-      <span class="spec-label">Average Rating</span>
-      <span>{{ averageRating if averageRating is not none else "Unavailable" }}</span>
-    </div>
-    <div class="spec">
-      <span class="spec-label">Google Ratings</span>
-      <span>{{ numberOfRating if numberOfRating is not none else "0" }}</span>
-    </div>
-    <div class="spec">
       <span class="spec-label">OpenReads Avg Rating</span>
       <span>
         {{ ("%.1f" % localAverageRating) if localAverageRating is not none else "N/A" }}

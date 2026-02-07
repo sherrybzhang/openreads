@@ -108,8 +108,6 @@ def build_book_context(isbn):
         return None
 
     title, author, year = book_row
-    averageRating = retrieve_book(isbn, BookQuery.AVERAGE_RATING)
-    numberOfRating = retrieve_book(isbn, BookQuery.NUMBER_OF_RATING)
     reviews = db.execute(
         text(
             """
@@ -131,8 +129,6 @@ def build_book_context(isbn):
         "title": title,
         "author": author,
         "year": year,
-        "averageRating": averageRating,
-        "numberOfRating": numberOfRating,
         "reviews": reviews,
         "localReviewCount": localReviewCount,
         "localAverageRating": localAverageRating,
