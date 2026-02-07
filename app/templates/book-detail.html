@@ -102,7 +102,13 @@
       <div class="stack">
         {% for review in reviews %}
           <div class="spec">
-            {{ review.review }}
+            <div style="font-weight: 600;">{{ review.username }}</div>
+            <div class="muted" style="font-size: 0.9rem;">
+              Rating: {{ review.rating }} / 5
+            </div>
+            {% if review.review %}
+              <p class="review-text">{{ review.review }}</p>
+            {% endif %}
           </div>
         {% endfor %}
       </div>

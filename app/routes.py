@@ -111,7 +111,16 @@ def build_book_context(isbn):
     averageRating = retrieve_book(isbn, BookQuery.AVERAGE_RATING)
     numberOfRating = retrieve_book(isbn, BookQuery.NUMBER_OF_RATING)
     reviews = db.execute(
-        text("SELECT * FROM reviews WHERE isbn = :isbn"), {"isbn": isbn}
+        text(
+            """
+            SELECT r.review, r.rating, u.username
+            FROM reviews r
+            JOIN users u ON r.id = u.id
+            WHERE r.isbn = :isbn
+            ORDER BY r.created_at DESC
+            """
+        ),
+        {"isbn": isbn},
     ).fetchall()
     localReviewCount = len(reviews)
     localAverageRating = db.execute(

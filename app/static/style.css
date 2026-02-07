@@ -395,6 +395,10 @@ textarea:focus {
   display: block;
 }
 
+.review-text {
+  margin: 0 0 0;
+}
+
 .spec:hover {
   transform: translateY(-2px);
   border-color: rgba(61, 132, 255, 0.3);
