@@ -165,12 +165,13 @@ p {
   width: 35px;
   height: 35px;
   font-size: 0.95rem;
+  margin-top: 3px;
   text-decoration: none;
 }
 
 .profile-icon img {
-  width: 37px;
-  height: 37px;
+  width: 35px;
+  height: 35px;
   display: block;
 }
 
