@@ -4,7 +4,7 @@ OpenReads is a book review application that lets users create accounts, search f
 
 ***NOTE**: Originally built in 2023, updated in 2026 with backend fixes and a more polished, modern UI. The update focused on correctness, consistency, and visual quality without changing the core feature set.*
 
-![OpenReads Screenshot](docs/openreads-screenshot-feb7.png)
+![OpenReads Screenshot](docs/openreads-screenshot-feb8.png)
 
 ## Features
 - User registration and sign in
