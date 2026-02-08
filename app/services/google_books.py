@@ -10,6 +10,7 @@ from typing import Literal, Optional, overload
 
 logger = logging.getLogger(__name__)
 
+
 def _normalize_isbn(isbn: str) -> str:
     """
     Normalize ISBN by stripping spaces and hyphens.
@@ -28,6 +29,7 @@ def _is_valid_isbn(isbn: str) -> bool:
         )
     if len(normalized) == 13:
         return normalized.isdigit()
+    
     return False
 
 
@@ -157,4 +159,5 @@ def _fallback_response(isbn: str, query: BookQuery) -> Optional[object]:
     if query == BookQuery.NUMBER_OF_RATING:
         # Match the ratings count return type on failure
         return 0
+    
     return None
