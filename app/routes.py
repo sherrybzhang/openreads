@@ -44,13 +44,16 @@ def build_initials(username):
     """
     if not username:
         return "U"
+    
     trimmed = username.strip()
     if not trimmed:
         return "U"
+    
     parts = [part for part in trimmed.split() if part]
     if not parts:
         return trimmed[0].upper()
     initials = "".join(part[0].upper() for part in parts)
+
     return initials[:2]
 
 
@@ -62,23 +65,31 @@ def load_current_user():
         A dict with user data, or None if not authenticated.
     """
     if hasattr(g, "current_user"):
+        # Avoid repeated DB lookups in the same request
         return g.current_user
+    
     user_id = get_session()
     if user_id is None:
+        # No active session means no current user
         g.current_user = None
         return g.current_user
+    
     user_row = db.execute(
         text("SELECT id, username FROM users WHERE id = :id"),
         {"id": user_id},
     ).fetchone()
     if not user_row:
+        # Session id is stale or user was removed
         g.current_user = None
         return g.current_user
+    
+    # Store a lightweight user payload for templates
     g.current_user = {
         "id": user_row[0],
         "username": user_row[1],
         "initials": build_initials(user_row[1]),
     }
+
     return g.current_user
 
 
@@ -105,9 +116,11 @@ def build_book_context(isbn):
         {"isbn": isbn},
     ).fetchone()
     if not book_row:
+        # Surface "book not found" to the caller
         return None
 
     title, author, year = book_row
+    # Load local reviews along with reviewer names
     reviews = db.execute(
         text(
             """
@@ -120,6 +133,8 @@ def build_book_context(isbn):
         ),
         {"isbn": isbn},
     ).fetchall()
+
+    # Compute local review stats for the detail view
     localReviewCount = len(reviews)
     localAverageRating = db.execute(
         text("SELECT AVG(rating) FROM reviews WHERE isbn = :isbn"), {"isbn": isbn}
@@ -247,10 +262,12 @@ def profile():
     """
     current_user = load_current_user()
     if current_user is None:
+        # Redirect unauthenticated users back to sign-in
         session.pop("id", None)
         return render_template("sign-in.html", message="Please sign in to view your profile")
     user_id = current_user["id"]
 
+    # Aggregate review count and average rating for the user
     stats = db.execute(
         text("SELECT COUNT(*) AS total, AVG(rating) AS avg_rating FROM reviews WHERE id = :id"),
         {"id": user_id},
@@ -274,6 +291,7 @@ def profile():
 
     recent_reviews = []
     for row in recent_rows:
+        # Format timestamps for display without requiring a template filter
         created_at = row[4]
         if hasattr(created_at, "strftime"):
             created_label = created_at.strftime("%b %d, %Y")
@@ -325,7 +343,7 @@ def search():
             else:
                 return render_template("search.html", message="No matches were found")
 
-        # Search by Book Title
+        # Search by book title
         elif title and isbn == "" and author == "":
             books = db.execute(
                 text("SELECT * FROM books WHERE title ILIKE :title"),
@@ -336,7 +354,7 @@ def search():
             else:
                 return render_template("search.html", message="No matches were found")
 
-        # Search by Author
+        # Search by author
         elif author and isbn == "" and title == "":
             books = db.execute(
                 text("SELECT * FROM books WHERE author ILIKE :author"),
