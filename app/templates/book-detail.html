@@ -44,13 +44,13 @@
       <span>{{ isbn }}</span>
     </div>
     <div class="spec">
-      <span class="spec-label">OpenReads Avg Rating</span>
+      <span class="spec-label">Average Rating</span>
       <span>
         {{ ("%.1f" % localAverageRating) if localAverageRating is not none else "N/A" }}
       </span>
     </div>
     <div class="spec">
-      <span class="spec-label">OpenReads Reviews</span>
+      <span class="spec-label">Reviews</span>
       <span>{{ localReviewCount }}</span>
     </div>
   </div>
