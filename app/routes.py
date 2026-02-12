@@ -167,7 +167,7 @@ def register():
         # User did not provide a username and/or password
         if username == "" or password == "":
             return render_template(
-                "home.html", message="Please enter required fields"
+                "home.html", message="Please enter required fields."
             )
 
         # Username already exists in database
@@ -178,7 +178,7 @@ def register():
         if userDB:
             return render_template(
                 "home.html",
-                message="Username is already taken - please select a different one",
+                message="Username is already taken. Please select a different one.",
             )
 
         # Creating new account for the user
@@ -222,7 +222,7 @@ def login():
         # Username and/or password is missing
         if username == "" or password == "":
             return render_template(
-                "sign-in.html", message="Username and/or password is incorrect"
+                "sign-in.html", message="Username and/or password is incorrect."
             )
 
         # Checks if username exists, then validates password hash
@@ -235,7 +235,7 @@ def login():
             return redirect(url_for("search"))
 
         return render_template(
-            "sign-in.html", message="Username and/or password is incorrect"
+            "sign-in.html", message="Username and/or password is incorrect."
         )
 
 
@@ -264,7 +264,7 @@ def profile():
     if current_user is None:
         # Redirect unauthenticated users back to sign-in
         session.pop("id", None)
-        return render_template("sign-in.html", message="Please sign in to view your profile")
+        return render_template("sign-in.html", message="Please sign in to view your profile.")
     user_id = current_user["id"]
 
     # Aggregate review count and average rating for the user
@@ -341,7 +341,7 @@ def search():
             if books:
                 return render_template("search.html", books=books)
             else:
-                return render_template("search.html", message="No matches were found")
+                return render_template("search.html", message="No matches were found.")
 
         # Search by book title
         elif title and isbn == "" and author == "":
@@ -352,7 +352,7 @@ def search():
             if books:
                 return render_template("search.html", books=books)
             else:
-                return render_template("search.html", message="No matches were found")
+                return render_template("search.html", message="No matches were found.")
 
         # Search by author
         elif author and isbn == "" and title == "":
@@ -363,15 +363,15 @@ def search():
             if books:
                 return render_template("search.html", books=books)
             else:
-                return render_template("search.html", message="No matches were found")
+                return render_template("search.html", message="No matches were found.")
 
         if not isbn and not title and not author:
             return render_template(
-                "search.html", message="Please fill out at least one field below"
+                "search.html", message="Please fill out at least one field below."
             )
 
         return render_template(
-            "search.html", message="Please fill out at most one field below"
+            "search.html", message="Please fill out at most one field below."
         )
 
     # Returns user to search page
@@ -406,13 +406,13 @@ def view():
     except KeyError:
         return render_template(
             "search.html",
-            message="Please enter a book ISBN, title, or author first",
+            message="Please enter a book ISBN, title, or author first.",
         )
 
     # Selecting desired information from 'books' table in database
     context = build_book_context(isbn)
     if not context:
-        return render_template("search.html", message="Book not found")
+        return render_template("search.html", message="Book not found.")
 
     return render_template(
         "book-detail.html",
@@ -435,7 +435,7 @@ def review():
         id = get_session()
         if id is None:
             return render_template(
-                "sign-in.html", message="Please sign in to submit a review"
+                "sign-in.html", message="Please sign in to submit a review."
             )
         isbn = request.form.get("isbn", "").strip()
         review = request.form.get("review", "").strip()
@@ -444,15 +444,15 @@ def review():
             if not isbn:
                 return render_template(
                     "search.html",
-                    message="Please enter a book ISBN, title, or author first",
+                    message="Please enter a book ISBN, title, or author first.",
                 )
             context = build_book_context(isbn)
             if not context:
-                return render_template("search.html", message="Book not found")
+                return render_template("search.html", message="Book not found.")
             return render_template(
                 "book-detail.html",
                 isbn=isbn,
-                review_error="Please provide a rating and review",
+                review_error="Please provide a rating and review.",
                 **context,
             )
 
@@ -464,12 +464,12 @@ def review():
         if existingReviewCheck:
             context = build_book_context(isbn)
             if not context:
-                return render_template("search.html", message="Book not found")
+                return render_template("search.html", message="Book not found.")
             return render_template(
                 "book-detail.html",
                 isbn=isbn,
                 review_error=(
-                    "Unable to submit review - you have already completed a review for this book"
+                    "Unable to submit review. You have already completed a review for this book."
                 ),
                 **context,
             )
@@ -534,7 +534,7 @@ def api_info(isbn):
             return render_template("book-api.html", error=book_data["error"])
         if book_data:
             return render_template("book-api.html", book_data=book_data)
-        return render_template("book-api.html", error="Unable to fetch book details")
+        return render_template("book-api.html", error="Unable to fetch book details.")
     else:
-        error = "404 Error - The requested URL /api/books/" + isbn + " was not found on this server"
+        error = "404 Error - The requested URL /api/books/" + isbn + " was not found on this server."
         return render_template("book-api.html", error=error), 404
