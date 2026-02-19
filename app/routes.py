@@ -18,7 +18,7 @@ def index():
     return render_template("home.html")
 
 
-def set_session(user_id):
+def _set_session(user_id):
     """
     Persist the logged-in user id in the session.
 
@@ -28,7 +28,7 @@ def set_session(user_id):
     session["id"] = user_id
 
 
-def get_session():
+def _get_session():
     """
     Retrieve the logged-in user id from the session.
 
@@ -38,7 +38,7 @@ def get_session():
     return session.get("id")
 
 
-def build_initials(username):
+def _build_initials(username):
     """
     Build a short initials string from the username.
     """
@@ -57,7 +57,7 @@ def build_initials(username):
     return initials[:2]
 
 
-def load_current_user():
+def _load_current_user():
     """
     Load the current user for the active session.
 
@@ -68,7 +68,7 @@ def load_current_user():
         # Avoid repeated DB lookups in the same request
         return g.current_user
     
-    user_id = get_session()
+    user_id = _get_session()
     if user_id is None:
         # No active session means no current user
         g.current_user = None
@@ -87,21 +87,21 @@ def load_current_user():
     g.current_user = {
         "id": user_row[0],
         "username": user_row[1],
-        "initials": build_initials(user_row[1]),
+        "initials": _build_initials(user_row[1]),
     }
 
     return g.current_user
 
 
 @app.context_processor
-def inject_current_user():
+def _inject_current_user():
     """
     Expose the current user to templates.
     """
-    return {"current_user": load_current_user()}
+    return {"current_user": _load_current_user()}
 
 
-def build_book_context(isbn):
+def _build_book_context(isbn):
     """
     Build the template context for a book detail page.
 
@@ -135,8 +135,8 @@ def build_book_context(isbn):
     ).fetchall()
 
     # Compute local review stats for the detail view
-    localReviewCount = len(reviews)
-    localAverageRating = db.execute(
+    local_review_count = len(reviews)
+    local_average_rating = db.execute(
         text("SELECT AVG(rating) FROM reviews WHERE isbn = :isbn"), {"isbn": isbn}
     ).fetchone()[0]
 
@@ -145,8 +145,8 @@ def build_book_context(isbn):
         "author": author,
         "year": year,
         "reviews": reviews,
-        "localReviewCount": localReviewCount,
-        "localAverageRating": localAverageRating,
+        "local_review_count": local_review_count,
+        "local_average_rating": local_average_rating,
     }
 
 
@@ -171,11 +171,11 @@ def register():
             )
 
         # Username already exists in database
-        userDB = db.execute(
+        user_db = db.execute(
             text("SELECT * FROM users WHERE username = :username"),
             {"username": username},
         ).fetchone()
-        if userDB:
+        if user_db:
             return render_template(
                 "home.html",
                 message="Username is already taken. Please select a different one.",
@@ -191,11 +191,11 @@ def register():
         )
         db.commit()
 
-        return redirect(url_for("signin"))
+        return redirect(url_for("sign_in"))
 
 
 @app.route("/sign-in", methods=["GET"])
-def signin():
+def sign_in():
     """
     Render the sign-in page.
 
@@ -226,12 +226,12 @@ def login():
             )
 
         # Checks if username exists, then validates password hash
-        userInfo = db.execute(
+        user_info = db.execute(
             text("SELECT id, password FROM users WHERE username = :username"),
             {"username": username},
         ).fetchone()
-        if userInfo and check_password_hash(userInfo[1], password):
-            set_session(userInfo[0])  # Remembers user when they sign in
+        if user_info and check_password_hash(user_info[1], password):
+            _set_session(user_info[0])  # Remembers user when they sign in
             return redirect(url_for("search"))
 
         return render_template(
@@ -260,7 +260,7 @@ def profile():
     Returns:
         Rendered HTML response for the profile page.
     """
-    current_user = load_current_user()
+    current_user = _load_current_user()
     if current_user is None:
         # Redirect unauthenticated users back to sign-in
         session.pop("id", None)
@@ -410,7 +410,7 @@ def view():
         )
 
     # Selecting desired information from 'books' table in database
-    context = build_book_context(isbn)
+    context = _build_book_context(isbn)
     if not context:
         return render_template("search.html", message="Book not found.")
 
@@ -432,8 +432,8 @@ def review():
         Rendered book page with errors, or a redirect on success.
     """
     if request.method == "POST":
-        id = get_session()
-        if id is None:
+        user_id = _get_session()
+        if user_id is None:
             return render_template(
                 "sign-in.html", message="Please sign in to submit a review."
             )
@@ -446,7 +446,7 @@ def review():
                     "search.html",
                     message="Please enter a book ISBN, title, or author first.",
                 )
-            context = build_book_context(isbn)
+            context = _build_book_context(isbn)
             if not context:
                 return render_template("search.html", message="Book not found.")
             return render_template(
@@ -457,12 +457,12 @@ def review():
             )
 
         # User already has existing review for the book
-        existingReviewCheck = db.execute(
+        existing_review_check = db.execute(
             text("SELECT review FROM reviews WHERE id = :id AND isbn = :isbn"),
-            {"id": id, "isbn": isbn},
+            {"id": user_id, "isbn": isbn},
         ).fetchone()
-        if existingReviewCheck:
-            context = build_book_context(isbn)
+        if existing_review_check:
+            context = _build_book_context(isbn)
             if not context:
                 return render_template("search.html", message="Book not found.")
             return render_template(
@@ -480,7 +480,7 @@ def review():
                 text(
                     "INSERT INTO reviews (id, isbn, rating, review) VALUES (:id, :isbn, :rating, :review)"
                 ),
-                {"id": id, "isbn": isbn, "rating": rating, "review": review},
+                {"id": user_id, "isbn": isbn, "rating": rating, "review": review},
             )
             db.commit()
 
@@ -519,11 +519,11 @@ def api_info(isbn):
         Rendered HTML response with book data or error.
     """
     # Check to see if ISBN exists in database
-    checkISBN = db.execute(
+    check_isbn = db.execute(
         text("SELECT isbn FROM books WHERE isbn = :isbn"), {"isbn": isbn}
     ).fetchone()
 
-    if checkISBN:
+    if check_isbn:
         success = retrieve_book(isbn, BookQuery.JSON)
         try:
             book_data = json.loads(success) if success else None
