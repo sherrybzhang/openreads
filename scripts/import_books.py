@@ -1,10 +1,18 @@
 import csv
 import os
-from typing import Optional, Tuple
+from typing import Optional, Protocol, Tuple
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.sql import text
+
+
+class _SessionLike(Protocol):
+    def execute(self, statement: object, params: object = None) -> object:
+        ...
+
+    def rollback(self) -> None:
+        ...
 
 
 def get_database_url() -> str:
@@ -30,7 +38,7 @@ def log_error(error_log_path: str, message: str) -> None:
 
 
 def insert_batch(
-    db, batch_params: list[dict[str, str]], batch_rows: list[int], error_log_path: str
+    db: _SessionLike, batch_params: list[dict[str, str]], batch_rows: list[int], error_log_path: str
 ) -> Tuple[int, int, int]:
     """
     Insert a batch of book rows; fall back to per-row inserts on batch failure.

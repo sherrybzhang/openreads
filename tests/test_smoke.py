@@ -1,6 +1,6 @@
 from app import app
 
-def test_index():
+def test_index() -> None:
     app.testing = True
     client = app.test_client()
     response = client.get("/")

@@ -8,7 +8,7 @@ from enum import Enum
 from typing import Literal, Optional, overload
 
 
-logger = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
 
 def _normalize_isbn(isbn: str) -> str:
@@ -60,7 +60,7 @@ def retrieve_book(isbn: str, query: BookQuery) -> Optional[object]:
         JSON string, rating value (float or None), rating count (int), or None if unavailable.
     """
     if not _is_valid_isbn(isbn):
-        logger.warning("Invalid ISBN provided: %s", isbn)
+        _logger.warning("Invalid ISBN provided: %s", isbn)
         return _fallback_response(isbn, query)
 
     url = "https://www.googleapis.com/books/v1/volumes?"
@@ -73,43 +73,43 @@ def retrieve_book(isbn: str, query: BookQuery) -> Optional[object]:
             params["key"] = api_key
         res = requests.get(url, params=params, timeout=10)
     except requests.RequestException as exc:
-        logger.warning("Google Books request failed for ISBN %s: %s", isbn, exc)
+        _logger.warning("Google Books request failed for ISBN %s: %s", isbn, exc)
         # Network or request failure: return a safe fallback
         return _fallback_response(isbn, query)
 
     if res.status_code != 200:
-        logger.warning(
+        _logger.warning(
             "Google Books non-200 response for ISBN %s: %s", isbn, res.status_code
         )
         # Non-OK status: return a safe fallback
         return _fallback_response(isbn, query)
 
-    bookData = res.json()
-    items = bookData.get("items") or []
+    book_data = res.json()
+    items = book_data.get("items") or []
     if not items:
-        logger.info("Google Books returned no items for ISBN %s", isbn)
+        _logger.info("Google Books returned no items for ISBN %s", isbn)
         # No results: return a safe fallback
         return _fallback_response(isbn, query)
 
-    volumeInfo = items[0].get("volumeInfo", {})
-    authors = volumeInfo.get("authors", [])
-    editAuthor = authors if len(authors) > 1 else (authors[0] if authors else "Unknown")
+    volume_info = items[0].get("volumeInfo", {})
+    authors = volume_info.get("authors", [])
+    display_author = authors if len(authors) > 1 else (authors[0] if authors else "Unknown")
 
-    rating_raw = volumeInfo.get("averageRating")
+    rating_raw = volume_info.get("averageRating")
     rating = float(rating_raw) if rating_raw is not None else None
-    reviewCount = volumeInfo.get("ratingsCount", 0)
+    review_count = volume_info.get("ratingsCount", 0)
 
     if query == BookQuery.JSON:
         # Return a compact JSON string for API route usage
-        bookInfo = {
-            "title": volumeInfo.get("title", "Unknown"),
-            "author": editAuthor,
-            "year": (volumeInfo.get("publishedDate") or "")[:4],
+        book_info = {
+            "title": volume_info.get("title", "Unknown"),
+            "author": display_author,
+            "year": (volume_info.get("publishedDate") or "")[:4],
             "isbn": isbn,
             "average_rating": rating,
-            "review_count": reviewCount,
+            "review_count": review_count,
         }
-        return json.dumps(bookInfo)
+        return json.dumps(book_info)
 
     if query == BookQuery.AVERAGE_RATING:
         # Return average rating as provided by Google Books
@@ -117,7 +117,7 @@ def retrieve_book(isbn: str, query: BookQuery) -> Optional[object]:
 
     if query == BookQuery.NUMBER_OF_RATING:
         # Return ratings count as provided by Google Books
-        return reviewCount
+        return review_count
 
     # Unknown query type: fall back safely
     return _fallback_response(isbn, query)
