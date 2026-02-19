@@ -1,14 +1,25 @@
 import json
+from typing import TypedDict
 
 from app import app, db
 from app.services.google_books import BookQuery, retrieve_book
 from flask import render_template, request, session, redirect, url_for, g
+from flask.typing import ResponseReturnValue
 from sqlalchemy.sql import text
 from werkzeug.security import check_password_hash, generate_password_hash
 
 
+class CurrentUser(TypedDict):
+    id: int
+    username: str
+    initials: str
+
+
+BookContext = dict[str, object]
+
+
 @app.route("/")
-def index():
+def index() -> str:
     """
     Render the home page.
 
@@ -18,7 +29,7 @@ def index():
     return render_template("home.html")
 
 
-def _set_session(user_id):
+def _set_session(user_id: int) -> None:
     """
     Persist the logged-in user id in the session.
 
@@ -28,7 +39,7 @@ def _set_session(user_id):
     session["id"] = user_id
 
 
-def _get_session():
+def _get_session() -> int | None:
     """
     Retrieve the logged-in user id from the session.
 
@@ -38,7 +49,7 @@ def _get_session():
     return session.get("id")
 
 
-def _build_initials(username):
+def _build_initials(username: str | None) -> str:
     """
     Build a short initials string from the username.
     """
@@ -57,7 +68,7 @@ def _build_initials(username):
     return initials[:2]
 
 
-def _load_current_user():
+def _load_current_user() -> CurrentUser | None:
     """
     Load the current user for the active session.
 
@@ -94,14 +105,14 @@ def _load_current_user():
 
 
 @app.context_processor
-def _inject_current_user():
+def _inject_current_user() -> dict[str, CurrentUser | None]:
     """
     Expose the current user to templates.
     """
     return {"current_user": _load_current_user()}
 
 
-def _build_book_context(isbn):
+def _build_book_context(isbn: str) -> BookContext | None:
     """
     Build the template context for a book detail page.
 
@@ -151,7 +162,7 @@ def _build_book_context(isbn):
 
 
 @app.route("/register", methods=["POST"])
-def register():
+def register() -> ResponseReturnValue:
     """
     Handle user registration.
     
@@ -195,7 +206,7 @@ def register():
 
 
 @app.route("/sign-in", methods=["GET"])
-def sign_in():
+def sign_in() -> str:
     """
     Render the sign-in page.
 
@@ -206,7 +217,7 @@ def sign_in():
 
 
 @app.route("/sign-in", methods=["POST"])
-def login():
+def login() -> ResponseReturnValue:
     """
     Authenticate a user and start a session.
 
@@ -240,7 +251,7 @@ def login():
 
 
 @app.route("/logout", methods=["POST"])
-def logout():
+def logout() -> ResponseReturnValue:
     """
     Log out the current user.
 
@@ -253,7 +264,7 @@ def logout():
 
 
 @app.route("/profile")
-def profile():
+def profile() -> str:
     """
     Render the user profile page.
 
@@ -318,7 +329,7 @@ def profile():
 
 
 @app.route("/search", methods=["GET", "POST"])
-def search():
+def search() -> str:
     """
     Search for books by ISBN, title, or author.
 
@@ -379,7 +390,7 @@ def search():
 
 
 @app.route("/return-to-search", methods=["GET", "POST"])
-def return_to_search():
+def return_to_search() -> str:
     """
     Return the user to the search page.
 
@@ -391,7 +402,7 @@ def return_to_search():
 
 # Extracts information on the user's desired book and outputs it on book page
 @app.route("/book", methods=["POST"])
-def view():
+def view() -> str:
     """
     Render the book detail page for a selected book.
 
@@ -422,7 +433,7 @@ def view():
 
 
 @app.route("/review", methods=["POST"])
-def review():
+def review() -> ResponseReturnValue:
     """
     Submit a review for a book.
 
@@ -493,7 +504,7 @@ def review():
 
 
 @app.route("/status")
-def message():
+def message() -> str:
     """
     Render a status message page.
 
@@ -508,7 +519,7 @@ def message():
 
 
 @app.route("/api/books/<isbn>")
-def api_info(isbn):
+def api_info(isbn: str) -> ResponseReturnValue:
     """
     Render a page with book info from the Google Books API.
 
