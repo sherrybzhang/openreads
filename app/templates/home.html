@@ -1,21 +1,16 @@
 {% extends "base.html" %}
 
-{% block head %}
-<title>OpenReads</title>
-
-{% endblock %}
-
 {% block body %}
 <section class="hero">
   <div class="hero-copy">
     <a class="brand brand-link" href="{{ url_for('search') if current_user else url_for('index') }}">
-      <div class="brand-mark">OR</div>
+      <div class="brand-mark" aria-hidden="true">OR</div>
       <div>
         <div class="brand-name">OpenReads</div>
         <p class="brand-tag">Thoughtful reviews, curated reads</p>
       </div>
     </a>
-    <h2 style="margin-top: 15px;">Discover your next favorite book today</h2>
+    <h1 class="hero-heading">Discover your next favorite book today</h1>
     <p class="muted">
       OpenReads is a welcoming place to discover titles, compare ratings, and leave
       honest reviews. Search by ISBN, title, or author and keep your reading
@@ -26,24 +21,39 @@
   <div class="card" style="--delay: 0.1s;">
     <h2>Create Account</h2>
     {% if message %}
-      <div class="alert">{{ message }}</div>
+      <div class="alert" role="alert">{{ message }}</div>
     {% endif %}
     <form class="stack" action="/register" method="POST">
       <div class="field">
         <label for="username">Username</label>
-        <input class="input" type="text" id="username" name="username">
+        <input
+          class="input"
+          type="text"
+          id="username"
+          name="username"
+          autocomplete="username"
+          required
+          value="{{ form_data.username if form_data else '' }}"
+        >
       </div>
       <div class="field">
         <label for="password">Password</label>
-        <input class="input" type="password" id="password" name="password">
+        <input
+          class="input"
+          type="password"
+          id="password"
+          name="password"
+          autocomplete="new-password"
+          required
+        >
       </div>
       <button class="btn" type="submit">Register</button>
     </form>
 
-    <form action="/sign-in" method="GET" style="margin-top: 12px;">
+    <p class="inline-actions" style="margin-top: 12px;">
       <span class="muted">Already have an account?</span>
-      <button class="btn-link" type="submit">Sign In</button>
-    </form>
+      <a class="btn-link" href="{{ url_for('sign_in') }}">Sign In</a>
+    </p>
   </div>
 </section>
 

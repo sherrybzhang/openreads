@@ -1,28 +1,23 @@
 {% extends "base.html" %}
 
-{% block head %}
-<title>OpenReads</title>
-
-{% endblock %}
-
 {% block body %}
 <header class="site-header">
   <a class="brand brand-link" href="{{ url_for('search') if current_user else url_for('index') }}">
-    <div class="brand-mark">OR</div>
+    <div class="brand-mark" aria-hidden="true">OR</div>
     <div>
       <div class="brand-name">OpenReads</div>
       <p class="brand-tag">Reader profile</p>
     </div>
   </a>
   {% if current_user %}
-    <div class="header-actions">
-      <a class="profile-icon" href="{{ url_for('profile') }}" aria-label="Profile">
-        <img src="{{ url_for('static', filename='profile.png') }}" alt="Profile">
+    <nav class="header-actions" aria-label="Account">
+      <a class="profile-icon" href="{{ url_for('profile') }}" aria-label="Profile" aria-current="page">
+        <img src="{{ url_for('static', filename='profile.png') }}" alt="">
       </a>
       <form action="/logout" method="POST">
         <button class="btn btn-ghost" type="submit">Logout</button>
       </form>
-    </div>
+    </nav>
   {% endif %}
 </header>
 
@@ -31,7 +26,7 @@
     <div class="profile-summary">
       <div class="profile-avatar" aria-hidden="true">{{ current_user.initials }}</div>
       <div class="profile-info">
-        <h2>{{ current_user.username }}</h2>
+        <h1>{{ current_user.username }}</h1>
         <p class="muted">Keep track of your reviews and reading momentum.</p>
       </div>
     </div>
@@ -47,17 +42,15 @@
       </div>
     </div>
 
-    <form action="/return-to-search" method="POST" style="margin-top: 18px;">
-      <button class="btn btn-ghost" type="submit">Return to Search</button>
-    </form>
+    <a class="btn btn-ghost" href="{{ url_for('search') }}" style="margin-top: 18px;">Return to Search</a>
   </div>
 
-  <div class="card soft" style="--delay: 0.12s;">
-    <h2>Recent Reviews</h2>
+  <section class="card soft" style="--delay: 0.12s;" aria-labelledby="recent-reviews-heading">
+    <h2 id="recent-reviews-heading">Recent Reviews</h2>
     {% if recent_reviews %}
-      <div class="review-list">
+      <ul class="review-list" role="list">
         {% for review in recent_reviews %}
-          <div class="spec">
+          <li class="spec">
             <strong>{{ review.title }}</strong>
             <div class="muted">{{ review.author }} · Rating: {{ review.rating }} / 5</div>
             {% if review.review %}
@@ -66,12 +59,12 @@
             {% if review.created_at %}
               <div class="muted" style="font-size: 0.85rem; margin-top: -12px">{{ review.created_at }}</div>
             {% endif %}
-          </div>
+          </li>
         {% endfor %}
-      </div>
+      </ul>
     {% else %}
       <p class="muted">No reviews yet. Head back to search to add your first review.</p>
     {% endif %}
-  </div>
+  </section>
 </section>
 {% endblock %}
