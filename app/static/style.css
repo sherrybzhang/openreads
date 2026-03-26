@@ -268,6 +268,12 @@ p {
   gap: 14px;
 }
 
+.card-actions {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 18px;
+}
+
 .field {
   display: grid;
   gap: 6px;
@@ -459,7 +465,7 @@ input:focus-visible {
 }
 
 .helper-text {
-  margin: 0 0 10px;
+  margin: 0 0 12px;
   font-size: 0.95rem;
 }
 
