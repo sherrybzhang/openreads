@@ -1,28 +1,23 @@
 {% extends "base.html" %}
 
-{% block head %}
-<title>OpenReads</title>
-
-{% endblock %}
-
 {% block body %}
 <header class="site-header">
   <a class="brand brand-link" href="{{ url_for('search') if current_user else url_for('index') }}">
-    <div class="brand-mark">OR</div>
+    <div class="brand-mark" aria-hidden="true">OR</div>
     <div>
       <div class="brand-name">OpenReads</div>
       <p class="brand-tag">Book details</p>
     </div>
   </a>
   {% if current_user %}
-    <div class="header-actions">
+    <nav class="header-actions" aria-label="Account">
       <a class="profile-icon" href="{{ url_for('profile') }}" aria-label="Profile">
-        <img src="{{ url_for('static', filename='profile.png') }}" alt="Profile">
+        <img src="{{ url_for('static', filename='profile.png') }}" alt="">
       </a>
       <form action="/logout" method="POST">
         <button class="btn btn-ghost" type="submit">Logout</button>
       </form>
-    </div>
+    </nav>
   {% endif %}
 </header>
 
@@ -55,62 +50,61 @@
     </div>
   </div>
 
-  <form action="/return-to-search" method="POST" style="margin-top: 18px;">
-    <button class="btn btn-ghost" type="submit">Return to Search</button>
-  </form>
+  <a class="btn btn-ghost" href="{{ url_for('search') }}" style="margin-top: 18px;">Return to Search</a>
 </section>
 
 <section class="grid-2" style="margin-top: 24px;">
-  <div class="card" style="--delay: 0.12s;">
-    <h3>Write a Review</h3>
+  <section class="card" style="--delay: 0.12s;" aria-labelledby="review-form-heading">
+    <h2 id="review-form-heading">Write a Review</h2>
     {% if review_error %}
-      <div class="alert" style="margin-top: 12px;">{{ review_error }}</div>
+      <div class="alert" role="alert" style="margin-top: 12px;">{{ review_error }}</div>
     {% endif %}
     <form class="stack" action="/review" method="POST">
-      <div class="field">
-        <label id="rating-label" for="rating-5">Rating</label>
-        <div class="star-rating" role="radiogroup" aria-labelledby="rating-label">
-          <input id="rating-5" type="radio" name="rating" value="5">
-          <label for="rating-5" title="5 stars">★</label>
-          <input id="rating-4" type="radio" name="rating" value="4">
-          <label for="rating-4" title="4 stars">★</label>
-          <input id="rating-3" type="radio" name="rating" value="3">
-          <label for="rating-3" title="3 stars">★</label>
-          <input id="rating-2" type="radio" name="rating" value="2">
-          <label for="rating-2" title="2 stars">★</label>
-          <input id="rating-1" type="radio" name="rating" value="1">
-          <label for="rating-1" title="1 star">★</label>
+      <fieldset class="field rating-fieldset">
+        <legend>Rating</legend>
+        <p id="rating-help" class="helper-text">Choose a rating from 1 to 5 stars.</p>
+        <div class="star-rating" role="radiogroup" aria-describedby="rating-help">
+          <input id="rating-5" type="radio" name="rating" value="5" aria-label="5 stars" {% if selected_rating == "5" %}checked{% endif %}>
+          <label for="rating-5"><span class="sr-only">5 stars</span><span aria-hidden="true">★</span></label>
+          <input id="rating-4" type="radio" name="rating" value="4" aria-label="4 stars" {% if selected_rating == "4" %}checked{% endif %}>
+          <label for="rating-4"><span class="sr-only">4 stars</span><span aria-hidden="true">★</span></label>
+          <input id="rating-3" type="radio" name="rating" value="3" aria-label="3 stars" {% if selected_rating == "3" %}checked{% endif %}>
+          <label for="rating-3"><span class="sr-only">3 stars</span><span aria-hidden="true">★</span></label>
+          <input id="rating-2" type="radio" name="rating" value="2" aria-label="2 stars" {% if selected_rating == "2" %}checked{% endif %}>
+          <label for="rating-2"><span class="sr-only">2 stars</span><span aria-hidden="true">★</span></label>
+          <input id="rating-1" type="radio" name="rating" value="1" aria-label="1 star" {% if selected_rating == "1" %}checked{% endif %}>
+          <label for="rating-1"><span class="sr-only">1 star</span><span aria-hidden="true">★</span></label>
         </div>
-      </div>
+      </fieldset>
       <div class="field">
         <label for="review">Review</label>
-        <textarea id="review" name="review" rows="6"></textarea>
+        <textarea id="review" name="review" rows="6" required>{{ review_text or "" }}</textarea>
       </div>
       <button class="btn" type="submit">Submit Review</button>
-      <input type="text" id="isbn" name="isbn" value="{{ isbn }}" hidden="True">
+      <input type="hidden" name="isbn" value="{{ isbn }}">
     </form>
-  </div>
+  </section>
 
-  <div class="card soft" style="--delay: 0.18s;">
-    <h3>Reviews</h3>
+  <section class="card soft" style="--delay: 0.18s;" aria-labelledby="reviews-heading">
+    <h2 id="reviews-heading">Reviews</h2>
     {% if reviews %}
-      <div class="stack">
+      <ul class="review-list" role="list">
         {% for review in reviews %}
-          <div class="spec">
-            <div style="font-weight: 600;">{{ review.username }}</div>
+          <li class="spec">
+            <div class="review-author">{{ review.username }}</div>
             <div class="muted" style="font-size: 0.9rem;">
               Rating: {{ review.rating }} / 5
             </div>
             {% if review.review %}
               <p class="review-text">{{ review.review }}</p>
             {% endif %}
-          </div>
+          </li>
         {% endfor %}
-      </div>
+      </ul>
     {% else %}
       <p class="muted">No reviews yet. Be the first to leave one.</p>
     {% endif %}
-  </div>
+  </section>
 </section>
 
 {% endblock %}

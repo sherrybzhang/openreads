@@ -1,24 +1,23 @@
-{% extends "base.html" %} {% block head %}
-<title>OpenReads</title>
+{% extends "base.html" %}
 
-{% endblock %} {% block body %}
+{% block body %}
 <header class="site-header">
   <a class="brand brand-link" href="{{ url_for('search') if current_user else url_for('index') }}">
-    <div class="brand-mark">OR</div>
+    <div class="brand-mark" aria-hidden="true">OR</div>
     <div>
       <div class="brand-name">OpenReads</div>
       <p class="brand-tag">API response</p>
     </div>
   </a>
   {% if current_user %}
-    <div class="header-actions">
+    <nav class="header-actions" aria-label="Account">
       <a class="profile-icon" href="{{ url_for('profile') }}" aria-label="Profile">
-        <img src="{{ url_for('static', filename='profile.png') }}" alt="Profile">
+        <img src="{{ url_for('static', filename='profile.png') }}" alt="">
       </a>
       <form action="/logout" method="POST">
         <button class="btn btn-ghost" type="submit">Logout</button>
       </form>
-    </div>
+    </nav>
   {% endif %}
 </header>
 
@@ -56,13 +55,13 @@
       <span>{{ book_data.review_count if book_data.review_count is not none else "0" }}</span>
     </div>
   </div>
-  {% endif %} {% if error %}
-  <div class="alert" style="margin-top: 16px">{{ error }}</div>
   {% endif %}
 
-  <form action="/return-to-search" method="POST" style="margin-top: 18px;">
-    <button class="btn btn-ghost" type="submit">Return to Search</button>
-  </form>
+  {% if error %}
+    <div class="alert" role="alert" style="margin-top: 16px">{{ error }}</div>
+  {% endif %}
+
+  <a class="btn btn-ghost" href="{{ url_for('search') }}" style="margin-top: 18px;">Return to Search</a>
 </section>
 
 {% endblock %}

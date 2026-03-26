@@ -1,5 +1,5 @@
 import json
-from typing import TypedDict
+from typing import Optional, TypedDict
 
 from app import app, db
 from app.services.google_books import BookQuery, retrieve_book
@@ -18,6 +18,54 @@ class CurrentUser(TypedDict):
 BookContext = dict[str, object]
 
 
+def _render_home_page(
+    message: Optional[str] = None,
+    form_data: Optional[dict[str, str]] = None,
+) -> str:
+    """
+    Render the home page with optional form state.
+    """
+    return render_template(
+        "home.html",
+        page_title="OpenReads | Create Account",
+        message=message,
+        form_data=form_data or {},
+    )
+
+
+def _render_sign_in_page(
+    message: Optional[str] = None,
+    form_data: Optional[dict[str, str]] = None,
+) -> str:
+    """
+    Render the sign-in page with optional form state.
+    """
+    return render_template(
+        "sign-in.html",
+        page_title="OpenReads | Sign In",
+        message=message,
+        form_data=form_data or {},
+    )
+
+
+def _render_search_page(
+    *,
+    message: Optional[str] = None,
+    books: Optional[list[object]] = None,
+    form_data: Optional[dict[str, str]] = None,
+) -> str:
+    """
+    Render the search page with optional search results and form state.
+    """
+    return render_template(
+        "search.html",
+        page_title="OpenReads | Search Books",
+        message=message,
+        books=books or [],
+        form_data=form_data or {"isbn": "", "title": "", "author": ""},
+    )
+
+
 @app.route("/")
 def index() -> str:
     """
@@ -26,7 +74,7 @@ def index() -> str:
     Returns:
         Rendered HTML response for the index page.
     """
-    return render_template("home.html")
+    return _render_home_page()
 
 
 def _set_session(user_id: int) -> None:
@@ -39,7 +87,7 @@ def _set_session(user_id: int) -> None:
     session["id"] = user_id
 
 
-def _get_session() -> int | None:
+def _get_session() -> Optional[int]:
     """
     Retrieve the logged-in user id from the session.
 
@@ -49,7 +97,7 @@ def _get_session() -> int | None:
     return session.get("id")
 
 
-def _build_initials(username: str | None) -> str:
+def _build_initials(username: Optional[str]) -> str:
     """
     Build a short initials string from the username.
     """
@@ -68,7 +116,7 @@ def _build_initials(username: str | None) -> str:
     return initials[:2]
 
 
-def _load_current_user() -> CurrentUser | None:
+def _load_current_user() -> Optional[CurrentUser]:
     """
     Load the current user for the active session.
 
@@ -105,14 +153,14 @@ def _load_current_user() -> CurrentUser | None:
 
 
 @app.context_processor
-def _inject_current_user() -> dict[str, CurrentUser | None]:
+def _inject_current_user() -> dict[str, Optional[CurrentUser]]:
     """
     Expose the current user to templates.
     """
     return {"current_user": _load_current_user()}
 
 
-def _build_book_context(isbn: str) -> BookContext | None:
+def _build_book_context(isbn: str) -> Optional[BookContext]:
     """
     Build the template context for a book detail page.
 
@@ -174,11 +222,13 @@ def register() -> ResponseReturnValue:
     if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"]
+        form_data = {"username": username}
 
         # User did not provide a username and/or password
         if username == "" or password == "":
-            return render_template(
-                "home.html", message="Please enter required fields."
+            return _render_home_page(
+                message="Please enter required fields.",
+                form_data=form_data,
             )
 
         # Username already exists in database
@@ -187,9 +237,9 @@ def register() -> ResponseReturnValue:
             {"username": username},
         ).fetchone()
         if user_db:
-            return render_template(
-                "home.html",
+            return _render_home_page(
                 message="Username is already taken. Please select a different one.",
+                form_data=form_data,
             )
 
         # Creating new account for the user
@@ -213,7 +263,7 @@ def sign_in() -> str:
     Returns:
         Rendered HTML response for the sign-in page.
     """
-    return render_template("sign-in.html")
+    return _render_sign_in_page()
 
 
 @app.route("/sign-in", methods=["POST"])
@@ -229,11 +279,13 @@ def login() -> ResponseReturnValue:
     if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"]
+        form_data = {"username": username}
 
         # Username and/or password is missing
         if username == "" or password == "":
-            return render_template(
-                "sign-in.html", message="Username and/or password is incorrect."
+            return _render_sign_in_page(
+                message="Username and/or password is incorrect.",
+                form_data=form_data,
             )
 
         # Checks if username exists, then validates password hash
@@ -245,8 +297,9 @@ def login() -> ResponseReturnValue:
             _set_session(user_info[0])  # Remembers user when they sign in
             return redirect(url_for("search"))
 
-        return render_template(
-            "sign-in.html", message="Username and/or password is incorrect."
+        return _render_sign_in_page(
+            message="Username and/or password is incorrect.",
+            form_data=form_data,
         )
 
 
@@ -275,7 +328,7 @@ def profile() -> str:
     if current_user is None:
         # Redirect unauthenticated users back to sign-in
         session.pop("id", None)
-        return render_template("sign-in.html", message="Please sign in to view your profile.")
+        return _render_sign_in_page(message="Please sign in to view your profile.")
     user_id = current_user["id"]
 
     # Aggregate review count and average rating for the user
@@ -322,6 +375,7 @@ def profile() -> str:
 
     return render_template(
         "profile.html",
+        page_title=f"OpenReads | {current_user['username']}",
         review_total=review_total,
         average_rating=average_rating,
         recent_reviews=recent_reviews,
@@ -342,6 +396,7 @@ def search() -> str:
         isbn = request.form["isbn"].strip()
         title = request.form["title"].strip()
         author = request.form["author"].strip()
+        form_data = {"isbn": isbn, "title": title, "author": author}
 
         # Search by ISBN
         if isbn and title == "" and author == "":
@@ -350,9 +405,12 @@ def search() -> str:
                 {"isbn": f"%{isbn}%"},
             ).fetchall()
             if books:
-                return render_template("search.html", books=books)
+                return _render_search_page(books=books, form_data=form_data)
             else:
-                return render_template("search.html", message="No matches were found.")
+                return _render_search_page(
+                    message="No matches were found.",
+                    form_data=form_data,
+                )
 
         # Search by book title
         elif title and isbn == "" and author == "":
@@ -361,9 +419,12 @@ def search() -> str:
                 {"title": f"%{title}%"},
             ).fetchall()
             if books:
-                return render_template("search.html", books=books)
+                return _render_search_page(books=books, form_data=form_data)
             else:
-                return render_template("search.html", message="No matches were found.")
+                return _render_search_page(
+                    message="No matches were found.",
+                    form_data=form_data,
+                )
 
         # Search by author
         elif author and isbn == "" and title == "":
@@ -372,21 +433,26 @@ def search() -> str:
                 {"author": f"%{author}%"},
             ).fetchall()
             if books:
-                return render_template("search.html", books=books)
+                return _render_search_page(books=books, form_data=form_data)
             else:
-                return render_template("search.html", message="No matches were found.")
+                return _render_search_page(
+                    message="No matches were found.",
+                    form_data=form_data,
+                )
 
         if not isbn and not title and not author:
-            return render_template(
-                "search.html", message="Please fill out at least one field below."
+            return _render_search_page(
+                message="Please fill out at least one field below.",
+                form_data=form_data,
             )
 
-        return render_template(
-            "search.html", message="Please fill out at most one field below."
+        return _render_search_page(
+            message="Please fill out at most one field below.",
+            form_data=form_data,
         )
 
     # Returns user to search page
-    return render_template("search.html")
+    return _render_search_page()
 
 
 @app.route("/return-to-search", methods=["GET", "POST"])
@@ -397,7 +463,7 @@ def return_to_search() -> str:
     Returns:
         Rendered HTML response for the search page.
     """
-    return render_template("search.html")
+    return _render_search_page()
 
 
 # Extracts information on the user's desired book and outputs it on book page
@@ -415,19 +481,21 @@ def view() -> str:
     try:
         isbn = request.form["book"]
     except KeyError:
-        return render_template(
-            "search.html",
+        return _render_search_page(
             message="Please enter a book ISBN, title, or author first.",
         )
 
     # Selecting desired information from 'books' table in database
     context = _build_book_context(isbn)
     if not context:
-        return render_template("search.html", message="Book not found.")
+        return _render_search_page(message="Book not found.")
 
     return render_template(
         "book-detail.html",
+        page_title=f"OpenReads | {context['title']}",
         isbn=isbn,
+        review_text="",
+        selected_rating="",
         **context,
     )
 
@@ -445,25 +513,25 @@ def review() -> ResponseReturnValue:
     if request.method == "POST":
         user_id = _get_session()
         if user_id is None:
-            return render_template(
-                "sign-in.html", message="Please sign in to submit a review."
-            )
+            return _render_sign_in_page(message="Please sign in to submit a review.")
         isbn = request.form.get("isbn", "").strip()
         review = request.form.get("review", "").strip()
         rating = request.form.get("rating", "").strip()
         if not isbn or not review or not rating:
             if not isbn:
-                return render_template(
-                    "search.html",
+                return _render_search_page(
                     message="Please enter a book ISBN, title, or author first.",
                 )
             context = _build_book_context(isbn)
             if not context:
-                return render_template("search.html", message="Book not found.")
+                return _render_search_page(message="Book not found.")
             return render_template(
                 "book-detail.html",
+                page_title=f"OpenReads | {context['title']}",
                 isbn=isbn,
                 review_error="Please provide a rating and review.",
+                review_text=review,
+                selected_rating=rating,
                 **context,
             )
 
@@ -475,13 +543,16 @@ def review() -> ResponseReturnValue:
         if existing_review_check:
             context = _build_book_context(isbn)
             if not context:
-                return render_template("search.html", message="Book not found.")
+                return _render_search_page(message="Book not found.")
             return render_template(
                 "book-detail.html",
+                page_title=f"OpenReads | {context['title']}",
                 isbn=isbn,
                 review_error=(
                     "Unable to submit review. You have already completed a review for this book."
                 ),
+                review_text=review,
+                selected_rating=rating,
                 **context,
             )
 
@@ -515,7 +586,12 @@ def message() -> str:
     """
     success = request.args.get("success")
     error = request.args.get("error")
-    return render_template("status.html", success=success, error=error)
+    return render_template(
+        "status.html",
+        page_title="OpenReads | Status",
+        success=success,
+        error=error,
+    )
 
 
 @app.route("/api/books/<isbn>")
@@ -542,10 +618,26 @@ def api_info(isbn: str) -> ResponseReturnValue:
             book_data = None
 
         if book_data and book_data.get("error"):
-            return render_template("book-api.html", error=book_data["error"])
+            return render_template(
+                "book-api.html",
+                page_title=f"OpenReads | API | {isbn}",
+                error=book_data["error"],
+            )
         if book_data:
-            return render_template("book-api.html", book_data=book_data)
-        return render_template("book-api.html", error="Unable to fetch book details.")
+            return render_template(
+                "book-api.html",
+                page_title=f"OpenReads | API | {isbn}",
+                book_data=book_data,
+            )
+        return render_template(
+            "book-api.html",
+            page_title=f"OpenReads | API | {isbn}",
+            error="Unable to fetch book details.",
+        )
     else:
         error = "404 Error - The requested URL /api/books/" + isbn + " was not found on this server."
-        return render_template("book-api.html", error=error), 404
+        return render_template(
+            "book-api.html",
+            page_title=f"OpenReads | API | {isbn}",
+            error=error,
+        ), 404

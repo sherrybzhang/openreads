@@ -1,70 +1,93 @@
 {% extends "base.html" %}
 
-{% block head %}
-<title>OpenReads</title>
-
-{% endblock %}
-
 {% block body %}
 <header class="site-header">
   <a class="brand brand-link" href="{{ url_for('search') if current_user else url_for('index') }}">
-    <div class="brand-mark">OR</div>
+    <div class="brand-mark" aria-hidden="true">OR</div>
     <div>
       <div class="brand-name">OpenReads</div>
       <p class="brand-tag">Search and review</p>
     </div>
   </a>
   {% if current_user %}
-    <div class="header-actions">
+    <nav class="header-actions" aria-label="Account">
       <a class="profile-icon" href="{{ url_for('profile') }}" aria-label="Profile">
-        <img src="{{ url_for('static', filename='profile.png') }}" alt="Profile">
+        <img src="{{ url_for('static', filename='profile.png') }}" alt="">
       </a>
       <form action="/logout" method="POST">
         <button class="btn btn-ghost" type="submit">Logout</button>
       </form>
-    </div>
+    </nav>
   {% endif %}
 </header>
 
 <section class="grid-2">
-  <div class="card" style="--delay: 0.05s;">
-    <h2>Search</h2>
-    <p class="muted">Search by ISBN, title, or author. Fill out just one field.</p>
+  <section class="card" style="--delay: 0.05s;" aria-labelledby="search-heading">
+    <h1 id="search-heading">Search Books</h1>
+    <p id="search-help" class="muted">Search by ISBN, title, or author. Fill out just one field.</p>
 
     {% if message %}
-      <div class="alert">{{ message }}</div>
+      <div class="alert" role="alert">{{ message }}</div>
     {% endif %}
 
     <form class="stack" action="/search" method="POST">
       <div class="field">
         <label for="isbn">ISBN</label>
-        <input class="input" type="text" id="isbn" name="isbn">
+        <input
+          class="input"
+          type="text"
+          id="isbn"
+          name="isbn"
+          aria-describedby="search-help"
+          value="{{ form_data.isbn if form_data else '' }}"
+        >
       </div>
       <div class="field">
         <label for="title">Title</label>
-        <input class="input" type="text" id="title" name="title">
+        <input
+          class="input"
+          type="text"
+          id="title"
+          name="title"
+          aria-describedby="search-help"
+          value="{{ form_data.title if form_data else '' }}"
+        >
       </div>
       <div class="field">
         <label for="author">Author</label>
-        <input class="input" type="text" id="author" name="author">
+        <input
+          class="input"
+          type="text"
+          id="author"
+          name="author"
+          aria-describedby="search-help"
+          value="{{ form_data.author if form_data else '' }}"
+        >
       </div>
       <button class="btn" type="submit">Search</button>
     </form>
-  </div>
+  </section>
 
-  <div class="card" style="--delay: 0.12s;">
-    <h2>Results</h2>
-    <form class="stack" action="/book" method="POST">
-      <div class="select">
-        <select class="input" name="book">
-          {% for books in books %}
-            <option value="{{ books.isbn }}">{{ books.title }} ({{ books.year }}) by {{ books.author }}</option>
-          {% endfor %}
-        </select>
-      </div>
-      <button class="btn" type="submit">View Book</button>
-    </form>
-  </div>
+  <section class="card" style="--delay: 0.12s;" aria-labelledby="results-heading">
+    <h2 id="results-heading">Results</h2>
+    {% if books %}
+      <form class="stack" action="/book" method="POST">
+        <div class="field">
+          <label for="book">Choose a book</label>
+          <div class="select">
+            <select class="input" id="book" name="book">
+              {% for book in books %}
+                <option value="{{ book.isbn }}">{{ book.title }} ({{ book.year }}) by {{ book.author }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+        <button class="btn" type="submit">View Book</button>
+      </form>
+    {% else %}
+      <p class="muted">Search results will appear here after you submit a query.</p>
+    {% endif %}
+  </section>
 </section>
 
 {% endblock %}

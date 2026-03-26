@@ -1,40 +1,48 @@
 {% extends "base.html" %}
 
-{% block head %}
-<title>OpenReads</title>
-
-{% endblock %}
-
 {% block body %}
 <header class="site-header">
   <a class="brand brand-link" href="{{ url_for('search') if current_user else url_for('index') }}">
-    <div class="brand-mark">OR</div>
+    <div class="brand-mark" aria-hidden="true">OR</div>
     <div>
       <div class="brand-name">OpenReads</div>
       <p class="brand-tag">Welcome back</p>
     </div>
   </a>
-  <form action="/logout" method="POST">
-    <button class="btn btn-ghost" type="submit">Home</button>
-  </form>
+  <a class="btn btn-ghost" href="{{ url_for('index') }}">Home</a>
 </header>
 
 <section class="card" style="max-width: 520px; --delay: 0.08s;">
-  <h2>Sign In</h2>
+  <h1>Sign In</h1>
   <p class="muted">Access your reviews and start exploring new titles.</p>
 
   {% if message %}
-    <div class="alert">{{ message }}</div>
+    <div class="alert" role="alert">{{ message }}</div>
   {% endif %}
 
   <form class="stack" action="/sign-in" method="POST">
     <div class="field">
       <label for="username">Username</label>
-      <input class="input" type="text" id="username" name="username">
+      <input
+        class="input"
+        type="text"
+        id="username"
+        name="username"
+        autocomplete="username"
+        required
+        value="{{ form_data.username if form_data else '' }}"
+      >
     </div>
     <div class="field">
       <label for="password">Password</label>
-      <input class="input" type="password" id="password" name="password">
+      <input
+        class="input"
+        type="password"
+        id="password"
+        name="password"
+        autocomplete="current-password"
+        required
+      >
     </div>
     <button class="btn" type="submit">Sign In</button>
   </form>

@@ -5,13 +5,14 @@
   --surface-2: #f1f7ff;
   --ink: #1b2a41;
   --muted: #4d6b88;
-  --accent: #6aa7ff;
-  --accent-strong: #3d84ff;
+  --accent: #3574d5;
+  --accent-strong: #2961c2;
   --border: #d5e5ff;
   --shadow: 0 18px 40px rgba(46, 90, 160, 0.18);
   --radius: 18px;
-  --ring: rgba(61, 132, 255, 0.22);
+  --ring: rgba(23, 61, 130, 0.3);
   --glow: 0 16px 32px rgba(61, 132, 255, 0.18);
+  --focus-outline: #10284f;
 }
 
 *,
@@ -26,6 +27,14 @@ body {
   color: var(--ink);
   background: var(--bg);
   line-height: 1.6;
+}
+
+a {
+  color: var(--accent-strong);
+}
+
+a:hover {
+  color: var(--accent-strong);
 }
 
 h1,
@@ -63,6 +72,24 @@ p {
   overflow: hidden;
 }
 
+.skip-link {
+  position: absolute;
+  left: 16px;
+  top: 16px;
+  z-index: 10;
+  padding: 10px 14px;
+  background: var(--focus-outline);
+  color: #ffffff;
+  border-radius: 12px;
+  text-decoration: none;
+  transform: translateY(-150%);
+  transition: transform 0.2s ease;
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
 .bg-orb {
   position: absolute;
   width: 420px;
@@ -90,6 +117,10 @@ p {
   padding: 48px 0 80px;
   position: relative;
   z-index: 1;
+}
+
+.site-main {
+  display: block;
 }
 
 .site-header {
@@ -122,8 +153,8 @@ p {
 }
 
 .brand-link:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 3px var(--ring);
+  outline: 3px solid var(--focus-outline);
+  outline-offset: 4px;
   border-radius: 16px;
 }
 
@@ -207,6 +238,10 @@ p {
   animation-delay: 0.05s;
 }
 
+.hero-heading {
+  margin-top: 15px;
+}
+
 .card {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -256,6 +291,10 @@ textarea {
   transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 }
 
+textarea {
+  resize: vertical;
+}
+
 .select {
   position: relative;
   width: 100%;
@@ -284,12 +323,15 @@ textarea {
 .input:focus,
 select:focus,
 textarea:focus {
-  outline: none;
+  outline: 3px solid transparent;
   border-color: var(--accent);
   box-shadow: 0 0 0 3px var(--ring);
 }
 
 .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   background: linear-gradient(135deg, var(--accent), var(--accent-strong));
   color: white;
   border: none;
@@ -297,6 +339,7 @@ textarea:focus {
   padding: 10px 16px;
   font-weight: 600;
   cursor: pointer;
+  text-decoration: none;
   transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
   box-shadow: 0 7px 15px rgba(61, 132, 255, 0.24);
 }
@@ -308,6 +351,18 @@ textarea:focus {
 
 .btn:active {
   transform: translateY(0);
+}
+
+.btn:focus-visible,
+.btn-link:focus-visible,
+.skip-link:focus-visible,
+a:focus-visible,
+button:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+input:focus-visible {
+  outline: 3px solid var(--focus-outline);
+  outline-offset: 3px;
 }
 
 .btn-ghost {
@@ -329,6 +384,8 @@ textarea:focus {
   padding: 0;
   font-weight: 600;
   cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 0.12em;
 }
 
 .muted {
@@ -381,6 +438,9 @@ textarea:focus {
 .review-list {
   display: grid;
   gap: 12px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
 .spec {
@@ -389,6 +449,30 @@ textarea:focus {
   background: var(--surface-2);
   border: 1px solid var(--border);
   transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.inline-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: baseline;
+}
+
+.helper-text {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.rating-fieldset {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.rating-fieldset legend {
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 6px;
 }
 
 .star-rating {
@@ -403,12 +487,15 @@ textarea:focus {
 .star-rating input {
   position: absolute;
   opacity: 0;
+  width: 1px;
+  height: 1px;
 }
 
 .star-rating label {
-  color: #c6d8f7;
+  color: #7d9bc6;
   cursor: pointer;
   transition: transform 0.15s ease, color 0.15s ease;
+  line-height: 1;
 }
 
 .star-rating label:hover,
@@ -422,8 +509,8 @@ textarea:focus {
 
 .star-rating label:focus-visible,
 .star-rating input:focus-visible + label {
-  outline: none;
-  box-shadow: 0 0 0 3px var(--ring);
+  outline: 3px solid var(--focus-outline);
+  outline-offset: 4px;
   border-radius: 6px;
 }
 
@@ -438,6 +525,22 @@ textarea:focus {
 
 .review-text {
   margin: 0 0 0;
+}
+
+.review-author {
+  font-weight: 600;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .spec:hover {
@@ -466,8 +569,16 @@ textarea:focus {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto;
+    transition: none !important;
+  }
+
   .card,
-  .hero-copy {
+  .hero-copy,
+  .skip-link {
     animation: none;
   }
 }

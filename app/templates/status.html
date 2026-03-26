@@ -1,45 +1,38 @@
 {% extends "base.html" %}
 
-{% block head %}
-<title>OpenReads</title>
-
-{% endblock %}
-
 {% block body %}
 <header class="site-header">
   <a class="brand brand-link" href="{{ url_for('search') if current_user else url_for('index') }}">
-    <div class="brand-mark">OR</div>
+    <div class="brand-mark" aria-hidden="true">OR</div>
     <div>
       <div class="brand-name">OpenReads</div>
       <p class="brand-tag">Update</p>
     </div>
   </a>
   {% if current_user %}
-    <div class="header-actions">
+    <nav class="header-actions" aria-label="Account">
       <a class="profile-icon" href="{{ url_for('profile') }}" aria-label="Profile">
-        <img src="{{ url_for('static', filename='profile.png') }}" alt="Profile">
+        <img src="{{ url_for('static', filename='profile.png') }}" alt="">
       </a>
       <form action="/logout" method="POST">
         <button class="btn btn-ghost" type="submit">Logout</button>
       </form>
-    </div>
+    </nav>
   {% endif %}
 </header>
 
 <section class="card" style="max-width: 640px; --delay: 0.08s;">
   {% if error %}
     <h1>Unable to complete</h1>
-    <div class="alert">{{ error }}</div>
+    <div class="alert" role="alert">{{ error }}</div>
   {% endif %}
 
   {% if success %}
     <h1>Success</h1>
-    <div class="alert success">{{ success }}</div>
+    <div class="alert success" role="status" aria-live="polite">{{ success }}</div>
   {% endif %}
 
-  <form action="/return-to-search" method="POST" style="margin-top: 18px;">
-    <button class="btn btn-ghost" type="submit">Return to Search</button>
-  </form>
+  <a class="btn btn-ghost" href="{{ url_for('search') }}" style="margin-top: 18px;">Return to Search</a>
 </section>
 
 {% endblock %}
