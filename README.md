@@ -4,7 +4,7 @@ OpenReads is a book review application that lets users create accounts, search f
 
 ***NOTE**: Originally built from scratch in 2023. In 2026, I used AI-assisted development tools to help refactor, modernize, and improve parts of the codebase, including backend fixes and a more polished UI. The architecture, product decisions, and final implementation choices remained mine.*
 
-![OpenReads Screenshot](docs/openreads-screenshot-feb8.png)
+![OpenReads Screenshot](docs/openreads-screenshot-mar25.png)
 
 ## Features
 - User registration and sign in
@@ -13,6 +13,7 @@ OpenReads is a book review application that lets users create accounts, search f
 - Profile page with review summary and recent activity
 - One review per user per book
 - API route for book info
+- Improved accessibility and usability
 
 ## Technologies
 - **Languages:** Python, SQL, HTML, CSS
@@ -65,7 +66,7 @@ GET /api/books/0380795272
 If the ISBN is not in the database, the endpoint returns a 404 error.
 
 ## Tests
-Currently includes a small unit test suite.
+Currently includes a small test suite covering smoke tests, Google Books service behavior, and template accessibility checks.
 
 ```
 pytest
