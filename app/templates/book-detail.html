@@ -50,7 +50,9 @@
     </div>
   </div>
 
-  <a class="btn btn-ghost" href="{{ url_for('search') }}" style="margin-top: 18px;">Return to Search</a>
+  <div class="card-actions">
+    <a class="btn btn-ghost" href="{{ url_for('search') }}">Return to Search</a>
+  </div>
 </section>
 
 <section class="grid-2" style="margin-top: 24px;">
@@ -78,7 +80,7 @@
       </fieldset>
       <div class="field">
         <label for="review">Review</label>
-        <textarea id="review" name="review" rows="6" required>{{ review_text or "" }}</textarea>
+        <textarea id="review" name="review" rows="5" required>{{ review_text or "" }}</textarea>
       </div>
       <button class="btn" type="submit">Submit Review</button>
       <input type="hidden" name="isbn" value="{{ isbn }}">
