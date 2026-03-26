@@ -459,20 +459,30 @@ input:focus-visible {
 }
 
 .helper-text {
-  margin: 0;
+  margin: 0 0 10px;
   font-size: 0.95rem;
 }
 
 .rating-fieldset {
+  display: block;
   margin: 0;
   padding: 0;
   border: 0;
+  min-inline-size: 0;
 }
 
 .rating-fieldset legend {
+  display: block;
+  width: 100%;
+  max-width: none;
+  font-family: inherit;
+  font-size: 1rem;
   font-weight: 600;
   color: var(--ink);
-  margin-bottom: 6px;
+  line-height: 1.2;
+  margin-bottom: 2px;
+  padding: 0;
+  white-space: normal;
 }
 
 .star-rating {
