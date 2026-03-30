@@ -614,9 +614,14 @@ input:focus-visible {
 }
 
 @media (max-width: 640px) {
+  .shell {
+    padding: 24px 0 56px;
+  }
+
   .site-header {
     gap: 12px;
     align-items: center;
+    margin-bottom: 24px;
   }
 
   .brand {
