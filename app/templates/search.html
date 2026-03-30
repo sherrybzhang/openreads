@@ -14,7 +14,7 @@
       <a class="profile-icon" href="{{ url_for('profile') }}" aria-label="Profile">
         <img src="{{ url_for('static', filename='profile.png') }}" alt="">
       </a>
-      <form action="/logout" method="POST">
+      <form action="/logout" method="POST" novalidate>
         <button class="btn btn-ghost" type="submit">Logout</button>
       </form>
     </nav>
@@ -26,11 +26,7 @@
     <h1 id="search-heading">Search Books</h1>
     <p id="search-help" class="muted">Search by ISBN, title, or author. Fill out just one field.</p>
 
-    {% if message %}
-      <div class="alert" role="alert">{{ message }}</div>
-    {% endif %}
-
-    <form class="stack" action="/search" method="POST">
+    <form class="stack" action="/search" method="POST" novalidate>
       <div class="field">
         <label for="isbn">ISBN</label>
         <input
@@ -38,7 +34,8 @@
           type="text"
           id="isbn"
           name="isbn"
-          aria-describedby="search-help"
+          aria-describedby="{% if form_error %}search-help search-form-error{% else %}search-help{% endif %}"
+          {% if form_error %}aria-invalid="true"{% endif %}
           value="{{ form_data.isbn if form_data else '' }}"
         >
       </div>
@@ -49,7 +46,8 @@
           type="text"
           id="title"
           name="title"
-          aria-describedby="search-help"
+          aria-describedby="{% if form_error %}search-help search-form-error{% else %}search-help{% endif %}"
+          {% if form_error %}aria-invalid="true"{% endif %}
           value="{{ form_data.title if form_data else '' }}"
         >
       </div>
@@ -60,10 +58,17 @@
           type="text"
           id="author"
           name="author"
-          aria-describedby="search-help"
+          aria-describedby="{% if form_error %}search-help search-form-error{% else %}search-help{% endif %}"
+          {% if form_error %}aria-invalid="true"{% endif %}
           value="{{ form_data.author if form_data else '' }}"
         >
       </div>
+      {% if message %}
+        <p class="field-error" role="alert">{{ message }}</p>
+      {% endif %}
+      {% if form_error %}
+        <p id="search-form-error" class="field-error" role="alert">{{ form_error }}</p>
+      {% endif %}
       <button class="btn" type="submit">Search</button>
     </form>
   </section>
@@ -71,7 +76,7 @@
   <section class="card" style="--delay: 0.12s;" aria-labelledby="results-heading">
     <h2 id="results-heading">Results</h2>
     {% if books %}
-      <form class="stack" action="/book" method="POST">
+      <form class="stack" action="/book" method="POST" novalidate>
         <div class="field">
           <label for="book">Choose a book</label>
           <div class="select">

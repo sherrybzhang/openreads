@@ -340,6 +340,10 @@ textarea:focus {
   box-shadow: 0 0 0 3px var(--ring);
 }
 
+[aria-invalid="true"] {
+  border-color: #d27a7a;
+}
+
 .btn {
   display: inline-flex;
   align-items: center;
@@ -404,15 +408,19 @@ input:focus-visible {
   color: var(--muted);
 }
 
-.alert {
+.notice {
   padding: 10px 12px;
   border-radius: 10px;
+  margin: 0;
+}
+
+.notice-error {
   background: #fbeaea;
   color: #a73333;
   border: 1px solid #f4caca;
 }
 
-.alert.success {
+.notice-success {
   background: #eaf6ee;
   color: #1b6b3a;
   border: 1px solid #cfe8d8;

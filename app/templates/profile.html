@@ -14,7 +14,7 @@
       <a class="profile-icon" href="{{ url_for('profile') }}" aria-label="Profile" aria-current="page">
         <img src="{{ url_for('static', filename='profile.png') }}" alt="">
       </a>
-      <form action="/logout" method="POST">
+      <form action="/logout" method="POST" novalidate>
         <button class="btn btn-ghost" type="submit">Logout</button>
       </form>
     </nav>

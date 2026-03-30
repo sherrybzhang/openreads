@@ -16,11 +16,7 @@
   <h1>Sign In</h1>
   <p class="muted">Access your reviews and start exploring new titles.</p>
 
-  {% if message %}
-    <div class="alert" role="alert">{{ message }}</div>
-  {% endif %}
-
-  <form class="stack" action="/sign-in" method="POST">
+  <form class="stack" action="/sign-in" method="POST" novalidate>
     <div class="field">
       <label for="username">Username</label>
       <input
@@ -52,6 +48,9 @@
         <p id="password-error" class="field-error" role="alert">{{ field_errors.password }}</p>
       {% endif %}
     </div>
+    {% if message %}
+      <div class="notice notice-error" role="alert">{{ message }}</div>
+    {% endif %}
     <button class="btn" type="submit">Sign In</button>
   </form>
 </section>

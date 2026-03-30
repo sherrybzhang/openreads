@@ -58,6 +58,7 @@ def _render_search_page(
     message: Optional[str] = None,
     books: Optional[list[object]] = None,
     form_data: Optional[dict[str, str]] = None,
+    form_error: Optional[str] = None,
 ) -> str:
     """
     Render the search page with optional search results and form state.
@@ -68,6 +69,31 @@ def _render_search_page(
         message=message,
         books=books or [],
         form_data=form_data or {"isbn": "", "title": "", "author": ""},
+        form_error=form_error,
+    )
+
+
+def _render_book_detail_page(
+    isbn: str,
+    context: BookContext,
+    *,
+    review_text: str = "",
+    selected_rating: str = "",
+    review_message: Optional[str] = None,
+    field_errors: Optional[FieldErrors] = None,
+) -> str:
+    """
+    Render the book detail page with optional review form state.
+    """
+    return render_template(
+        "book-detail.html",
+        page_title=f"OpenReads | {context['title']}",
+        isbn=isbn,
+        review_text=review_text,
+        selected_rating=selected_rating,
+        review_message=review_message,
+        field_errors=field_errors or {},
+        **context,
     )
 
 
@@ -461,13 +487,13 @@ def search() -> str:
 
         if not isbn and not title and not author:
             return _render_search_page(
-                message="Please fill out at least one field below.",
                 form_data=form_data,
+                form_error="Please fill out at least one field below.",
             )
 
         return _render_search_page(
-            message="Please fill out at most one field below.",
             form_data=form_data,
+            form_error="Please fill out at most one field below.",
         )
 
     # Returns user to search page
@@ -509,14 +535,7 @@ def view() -> str:
     if not context:
         return _render_search_page(message="Book not found.")
 
-    return render_template(
-        "book-detail.html",
-        page_title=f"OpenReads | {context['title']}",
-        isbn=isbn,
-        review_text="",
-        selected_rating="",
-        **context,
-    )
+    return _render_book_detail_page(isbn, context)
 
 
 @app.route("/review", methods=["POST"])
@@ -544,14 +563,17 @@ def review() -> ResponseReturnValue:
             context = _build_book_context(isbn)
             if not context:
                 return _render_search_page(message="Book not found.")
-            return render_template(
-                "book-detail.html",
-                page_title=f"OpenReads | {context['title']}",
-                isbn=isbn,
-                review_error="Please provide a rating and review.",
+            field_errors: FieldErrors = {}
+            if not rating:
+                field_errors["rating"] = "Please choose a rating."
+            if not review:
+                field_errors["review"] = "Please enter a review."
+            return _render_book_detail_page(
+                isbn,
+                context,
                 review_text=review,
                 selected_rating=rating,
-                **context,
+                field_errors=field_errors,
             )
 
         # User already has existing review for the book
@@ -563,16 +585,14 @@ def review() -> ResponseReturnValue:
             context = _build_book_context(isbn)
             if not context:
                 return _render_search_page(message="Book not found.")
-            return render_template(
-                "book-detail.html",
-                page_title=f"OpenReads | {context['title']}",
-                isbn=isbn,
-                review_error=(
-                    "Unable to submit review. You have already completed a review for this book."
-                ),
+            return _render_book_detail_page(
+                isbn,
+                context,
                 review_text=review,
                 selected_rating=rating,
-                **context,
+                review_message=(
+                    "Unable to submit review. You have already completed a review for this book."
+                ),
             )
 
         # Creating new review
