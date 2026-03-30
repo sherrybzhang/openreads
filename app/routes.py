@@ -16,11 +16,13 @@ class CurrentUser(TypedDict):
 
 
 BookContext = dict[str, object]
+FieldErrors = dict[str, str]
 
 
 def _render_home_page(
     message: Optional[str] = None,
     form_data: Optional[dict[str, str]] = None,
+    field_errors: Optional[FieldErrors] = None,
 ) -> str:
     """
     Render the home page with optional form state.
@@ -30,12 +32,14 @@ def _render_home_page(
         page_title="OpenReads | Create Account",
         message=message,
         form_data=form_data or {},
+        field_errors=field_errors or {},
     )
 
 
 def _render_sign_in_page(
     message: Optional[str] = None,
     form_data: Optional[dict[str, str]] = None,
+    field_errors: Optional[FieldErrors] = None,
 ) -> str:
     """
     Render the sign-in page with optional form state.
@@ -45,6 +49,7 @@ def _render_sign_in_page(
         page_title="OpenReads | Sign In",
         message=message,
         form_data=form_data or {},
+        field_errors=field_errors or {},
     )
 
 
@@ -225,10 +230,15 @@ def register() -> ResponseReturnValue:
         form_data = {"username": username}
 
         # User did not provide a username and/or password
-        if username == "" or password == "":
+        field_errors: FieldErrors = {}
+        if username == "":
+            field_errors["username"] = "Please enter a username."
+        if password == "":
+            field_errors["password"] = "Please enter a password."
+        if field_errors:
             return _render_home_page(
-                message="Please enter required fields.",
                 form_data=form_data,
+                field_errors=field_errors,
             )
 
         # Username already exists in database
@@ -238,8 +248,12 @@ def register() -> ResponseReturnValue:
         ).fetchone()
         if user_db:
             return _render_home_page(
-                message="Username is already taken. Please select a different one.",
                 form_data=form_data,
+                field_errors={
+                    "username": (
+                        "Username is already taken. Please select a different one."
+                    )
+                },
             )
 
         # Creating new account for the user
@@ -282,10 +296,15 @@ def login() -> ResponseReturnValue:
         form_data = {"username": username}
 
         # Username and/or password is missing
-        if username == "" or password == "":
+        field_errors = {}
+        if username == "":
+            field_errors["username"] = "Please enter your username."
+        if password == "":
+            field_errors["password"] = "Please enter your password."
+        if field_errors:
             return _render_sign_in_page(
-                message="Username and/or password is incorrect.",
                 form_data=form_data,
+                field_errors=field_errors,
             )
 
         # Checks if username exists, then validates password hash
@@ -298,8 +317,8 @@ def login() -> ResponseReturnValue:
             return redirect(url_for("search"))
 
         return _render_sign_in_page(
-            message="Username and/or password is incorrect.",
             form_data=form_data,
+            field_errors={"password": "Username and/or password is incorrect."},
         )
 
 

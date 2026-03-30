@@ -30,8 +30,12 @@
         name="username"
         autocomplete="username"
         required
+        {% if field_errors.username %}aria-describedby="username-error" aria-invalid="true"{% endif %}
         value="{{ form_data.username if form_data else '' }}"
       >
+      {% if field_errors.username %}
+        <p id="username-error" class="field-error" role="alert">{{ field_errors.username }}</p>
+      {% endif %}
     </div>
     <div class="field">
       <label for="password">Password</label>
@@ -42,7 +46,11 @@
         name="password"
         autocomplete="current-password"
         required
+        {% if field_errors.password %}aria-describedby="password-error" aria-invalid="true"{% endif %}
       >
+      {% if field_errors.password %}
+        <p id="password-error" class="field-error" role="alert">{{ field_errors.password }}</p>
+      {% endif %}
     </div>
     <button class="btn" type="submit">Sign In</button>
   </form>

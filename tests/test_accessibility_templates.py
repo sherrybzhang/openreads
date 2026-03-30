@@ -36,6 +36,36 @@ def test_search_page_has_labeled_results_select() -> None:
     assert 'id="book"' in html
 
 
+def test_home_page_renders_username_error_below_input() -> None:
+    with app.test_request_context("/"):
+        html = render_template(
+            "home.html",
+            page_title="OpenReads | Create Account",
+            message=None,
+            form_data={"username": "taken_name"},
+            field_errors={"username": "Username is already taken."},
+        )
+
+    assert 'aria-describedby="username-error"' in html
+    assert 'id="username-error"' in html
+    assert "Username is already taken." in html
+
+
+def test_sign_in_page_renders_password_error_below_input() -> None:
+    with app.test_request_context("/sign-in"):
+        html = render_template(
+            "sign-in.html",
+            page_title="OpenReads | Sign In",
+            message=None,
+            form_data={"username": "reader1"},
+            field_errors={"password": "Username and/or password is incorrect."},
+        )
+
+    assert 'aria-describedby="password-error"' in html
+    assert 'id="password-error"' in html
+    assert "Username and/or password is incorrect." in html
+
+
 def test_book_detail_rating_inputs_have_accessible_names() -> None:
     with app.test_request_context("/book"):
         html = render_template(
