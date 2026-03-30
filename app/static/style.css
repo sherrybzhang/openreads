@@ -615,9 +615,27 @@ input:focus-visible {
 
 @media (max-width: 640px) {
   .site-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 16px;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .brand {
+    min-width: 0;
+    gap: 10px;
+  }
+
+  .brand-link {
+    min-width: 0;
+  }
+
+  .brand-name,
+  .brand-tag {
+    overflow-wrap: anywhere;
+  }
+
+  .header-actions {
+    margin-left: auto;
+    flex-shrink: 0;
   }
 
   .profile-grid {
