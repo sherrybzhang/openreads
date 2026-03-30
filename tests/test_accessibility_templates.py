@@ -122,8 +122,8 @@ def test_book_detail_review_form_renders_field_errors_inline() -> None:
     assert 'aria-describedby="rating-help rating-error"' in html
     assert 'id="review-error"' in html
     assert 'aria-describedby="review-error"' in html
-    assert html.index('id="rating-error"') < html.index("Submit Review")
-    assert html.index('id="review-error"') < html.index("Submit Review")
+    assert html.index('id="rating-error"') > html.index('class="star-rating"')
+    assert html.index('id="review-error"') > html.index('id="review"')
 
 
 def test_book_detail_rating_inputs_have_accessible_names() -> None:

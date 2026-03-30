@@ -74,19 +74,19 @@
           <input id="rating-1" type="radio" name="rating" value="1" aria-label="1 star" {% if field_errors.rating %}aria-invalid="true"{% endif %} {% if selected_rating == "1" %}checked{% endif %}>
           <label for="rating-1"><span class="sr-only">1 star</span><span aria-hidden="true">★</span></label>
         </div>
+        {% if field_errors.rating %}
+          <p id="rating-error" class="field-error" role="alert">{{ field_errors.rating }}</p>
+        {% endif %}
       </fieldset>
       <div class="field">
         <label for="review">Review</label>
         <textarea id="review" name="review" rows="5" required {% if field_errors.review %}aria-describedby="review-error" aria-invalid="true"{% endif %}>{{ review_text or "" }}</textarea>
+        {% if field_errors.review %}
+          <p id="review-error" class="field-error" role="alert">{{ field_errors.review }}</p>
+        {% endif %}
       </div>
       {% if review_message %}
         <p class="field-error" role="alert">{{ review_message }}</p>
-      {% endif %}
-      {% if field_errors.rating %}
-        <p id="rating-error" class="field-error" role="alert">{{ field_errors.rating }}</p>
-      {% endif %}
-      {% if field_errors.review %}
-        <p id="review-error" class="field-error" role="alert">{{ field_errors.review }}</p>
       {% endif %}
       <button class="btn" type="submit">Submit Review</button>
       <input type="hidden" name="isbn" value="{{ isbn }}">
