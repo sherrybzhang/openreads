@@ -1,6 +1,6 @@
 # OpenReads
 
-OpenReads is a book review application that lets users create accounts, search for books, view book details, submit reviews, and view a personal profile. It also supports a JSON-style response via `/api/books/<isbn>` using the Google Books API.
+OpenReads is a book review application that lets users create accounts, search for books, view book details, submit reviews, and view a personal profile. It also includes an API-backed route at `/api/books/<isbn>` using the Google Books API.
 
 ***NOTE**: Originally built from scratch in 2023. In 2026, I used AI-assisted development tools to help refactor, modernize, and improve parts of the codebase, including backend fixes and a more polished UI. The architecture, product decisions, and final implementation choices remained mine.*
 
@@ -27,10 +27,11 @@ OpenReads is a book review application that lets users create accounts, search f
 ```
 pip install -r requirements.txt
 ```
-3) Set environment variables (optional defaults are provided in `app/config.py` and loaded via `python-dotenv`):
+3) Set environment variables (`SECRET_KEY` and `DATABASE_URL` have optional defaults in `app/config.py`; values are loaded via `python-dotenv`):
 ```
 export SECRET_KEY="your-secret"
 export DATABASE_URL="postgresql://localhost/your_db"
+export GOOGLE_BOOKS_API_KEY="your-api-key"  # optional
 ```
 4) Create tables:
 ```
@@ -56,14 +57,19 @@ http://localhost:8080
 4. Submit a review and rating; your profile summarizes your activity.
 
 ## API
-`GET /api/books/<isbn>` returns Google Books data for ISBNs in the local database.
+`GET /api/books/<isbn>` attempts to fetch book data directly from Google Books for the provided ISBN.
 
 Example:
 ```
 GET /api/books/0380795272
 ```
 
-If the ISBN is not in the database, the endpoint returns a 404 error.
+If Google Books data is unavailable, the route shows an error message.
+
+## Known Limitations
+- Search only supports one field at a time and is limited to the local books dataset.
+- `/api/books/<isbn>` renders an HTML page instead of returning pure JSON.
+- The project still uses a small-project structure, with most route logic in one file and limited automated test coverage.
 
 ## Tests
 Currently includes a small test suite covering smoke tests, Google Books service behavior, and template accessibility checks.
