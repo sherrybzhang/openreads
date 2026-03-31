@@ -16,11 +16,7 @@
   <h1>Sign In</h1>
   <p class="muted">Access your reviews and start exploring new titles.</p>
 
-  {% if message %}
-    <div class="alert" role="alert">{{ message }}</div>
-  {% endif %}
-
-  <form class="stack" action="/sign-in" method="POST">
+  <form class="stack" action="/sign-in" method="POST" novalidate>
     <div class="field">
       <label for="username">Username</label>
       <input
@@ -30,8 +26,12 @@
         name="username"
         autocomplete="username"
         required
+        {% if field_errors.username %}aria-describedby="username-error" aria-invalid="true"{% endif %}
         value="{{ form_data.username if form_data else '' }}"
       >
+      {% if field_errors.username %}
+        <p id="username-error" class="field-error" role="alert">{{ field_errors.username }}</p>
+      {% endif %}
     </div>
     <div class="field">
       <label for="password">Password</label>
@@ -42,8 +42,15 @@
         name="password"
         autocomplete="current-password"
         required
+        {% if field_errors.password %}aria-describedby="password-error" aria-invalid="true"{% endif %}
       >
+      {% if field_errors.password %}
+        <p id="password-error" class="field-error" role="alert">{{ field_errors.password }}</p>
+      {% endif %}
     </div>
+    {% if message %}
+      <div class="notice notice-error" role="alert">{{ message }}</div>
+    {% endif %}
     <button class="btn" type="submit">Sign In</button>
   </form>
 </section>

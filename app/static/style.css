@@ -279,6 +279,12 @@ p {
   gap: 6px;
 }
 
+.field-error {
+  margin: 0;
+  color: #a73333;
+  font-size: 0.95rem;
+}
+
 label {
   font-weight: 600;
   color: var(--ink);
@@ -332,6 +338,10 @@ textarea:focus {
   outline: 3px solid transparent;
   border-color: var(--accent);
   box-shadow: 0 0 0 3px var(--ring);
+}
+
+[aria-invalid="true"] {
+  border-color: #d27a7a;
 }
 
 .btn {
@@ -398,15 +408,19 @@ input:focus-visible {
   color: var(--muted);
 }
 
-.alert {
+.notice {
   padding: 10px 12px;
   border-radius: 10px;
+  margin: 0;
+}
+
+.notice-error {
   background: #fbeaea;
   color: #a73333;
   border: 1px solid #f4caca;
 }
 
-.alert.success {
+.notice-success {
   background: #eaf6ee;
   color: #1b6b3a;
   border: 1px solid #cfe8d8;
@@ -600,10 +614,33 @@ input:focus-visible {
 }
 
 @media (max-width: 640px) {
+  .shell {
+    padding: 24px 0 56px;
+  }
+
   .site-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 16px;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 24px;
+  }
+
+  .brand {
+    min-width: 0;
+    gap: 10px;
+  }
+
+  .brand-link {
+    min-width: 0;
+  }
+
+  .brand-name,
+  .brand-tag {
+    overflow-wrap: anywhere;
+  }
+
+  .header-actions {
+    margin-left: auto;
+    flex-shrink: 0;
   }
 
   .profile-grid {

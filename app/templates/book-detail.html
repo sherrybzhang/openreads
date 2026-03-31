@@ -14,7 +14,7 @@
       <a class="profile-icon" href="{{ url_for('profile') }}" aria-label="Profile">
         <img src="{{ url_for('static', filename='profile.png') }}" alt="">
       </a>
-      <form action="/logout" method="POST">
+      <form action="/logout" method="POST" novalidate>
         <button class="btn btn-ghost" type="submit">Logout</button>
       </form>
     </nav>
@@ -58,30 +58,36 @@
 <section class="grid-2" style="margin-top: 24px;">
   <section class="card" style="--delay: 0.12s;" aria-labelledby="review-form-heading">
     <h2 id="review-form-heading">Write a Review</h2>
-    {% if review_error %}
-      <div class="alert" role="alert" style="margin-top: 12px;">{{ review_error }}</div>
-    {% endif %}
-    <form class="stack" action="/review" method="POST">
+    <form class="stack" action="/review" method="POST" novalidate>
       <fieldset class="field rating-fieldset">
         <legend>Rating</legend>
         <p id="rating-help" class="helper-text">Choose a rating from 1 to 5 stars.</p>
-        <div class="star-rating" role="radiogroup" aria-describedby="rating-help">
-          <input id="rating-5" type="radio" name="rating" value="5" aria-label="5 stars" {% if selected_rating == "5" %}checked{% endif %}>
+        <div class="star-rating" role="radiogroup" {% if field_errors.rating %}aria-describedby="rating-help rating-error"{% else %}aria-describedby="rating-help"{% endif %}>
+          <input id="rating-5" type="radio" name="rating" value="5" aria-label="5 stars" {% if field_errors.rating %}aria-invalid="true"{% endif %} {% if selected_rating == "5" %}checked{% endif %}>
           <label for="rating-5"><span class="sr-only">5 stars</span><span aria-hidden="true">★</span></label>
-          <input id="rating-4" type="radio" name="rating" value="4" aria-label="4 stars" {% if selected_rating == "4" %}checked{% endif %}>
+          <input id="rating-4" type="radio" name="rating" value="4" aria-label="4 stars" {% if field_errors.rating %}aria-invalid="true"{% endif %} {% if selected_rating == "4" %}checked{% endif %}>
           <label for="rating-4"><span class="sr-only">4 stars</span><span aria-hidden="true">★</span></label>
-          <input id="rating-3" type="radio" name="rating" value="3" aria-label="3 stars" {% if selected_rating == "3" %}checked{% endif %}>
+          <input id="rating-3" type="radio" name="rating" value="3" aria-label="3 stars" {% if field_errors.rating %}aria-invalid="true"{% endif %} {% if selected_rating == "3" %}checked{% endif %}>
           <label for="rating-3"><span class="sr-only">3 stars</span><span aria-hidden="true">★</span></label>
-          <input id="rating-2" type="radio" name="rating" value="2" aria-label="2 stars" {% if selected_rating == "2" %}checked{% endif %}>
+          <input id="rating-2" type="radio" name="rating" value="2" aria-label="2 stars" {% if field_errors.rating %}aria-invalid="true"{% endif %} {% if selected_rating == "2" %}checked{% endif %}>
           <label for="rating-2"><span class="sr-only">2 stars</span><span aria-hidden="true">★</span></label>
-          <input id="rating-1" type="radio" name="rating" value="1" aria-label="1 star" {% if selected_rating == "1" %}checked{% endif %}>
+          <input id="rating-1" type="radio" name="rating" value="1" aria-label="1 star" {% if field_errors.rating %}aria-invalid="true"{% endif %} {% if selected_rating == "1" %}checked{% endif %}>
           <label for="rating-1"><span class="sr-only">1 star</span><span aria-hidden="true">★</span></label>
         </div>
+        {% if field_errors.rating %}
+          <p id="rating-error" class="field-error" role="alert">{{ field_errors.rating }}</p>
+        {% endif %}
       </fieldset>
       <div class="field">
         <label for="review">Review</label>
-        <textarea id="review" name="review" rows="5" required>{{ review_text or "" }}</textarea>
+        <textarea id="review" name="review" rows="5" required {% if field_errors.review %}aria-describedby="review-error" aria-invalid="true"{% endif %}>{{ review_text or "" }}</textarea>
+        {% if field_errors.review %}
+          <p id="review-error" class="field-error" role="alert">{{ field_errors.review }}</p>
+        {% endif %}
       </div>
+      {% if review_message %}
+        <p class="field-error" role="alert">{{ review_message }}</p>
+      {% endif %}
       <button class="btn" type="submit">Submit Review</button>
       <input type="hidden" name="isbn" value="{{ isbn }}">
     </form>

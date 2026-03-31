@@ -14,7 +14,7 @@
       <a class="profile-icon" href="{{ url_for('profile') }}" aria-label="Profile">
         <img src="{{ url_for('static', filename='profile.png') }}" alt="">
       </a>
-      <form action="/logout" method="POST">
+      <form action="/logout" method="POST" novalidate>
         <button class="btn btn-ghost" type="submit">Logout</button>
       </form>
     </nav>
@@ -24,12 +24,12 @@
 <section class="card" style="max-width: 640px; --delay: 0.08s;">
   {% if error %}
     <h1>Unable to complete</h1>
-    <div class="alert" role="alert">{{ error }}</div>
+    <div class="notice notice-error" role="alert">{{ error }}</div>
   {% endif %}
 
   {% if success %}
     <h1>Success</h1>
-    <div class="alert success" role="status" aria-live="polite">{{ success }}</div>
+    <div class="notice notice-success" role="status" aria-live="polite">{{ success }}</div>
   {% endif %}
 
   <a class="btn btn-ghost" href="{{ url_for('search') }}" style="margin-top: 18px;">Return to Search</a>

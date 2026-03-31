@@ -14,7 +14,7 @@
       <a class="profile-icon" href="{{ url_for('profile') }}" aria-label="Profile">
         <img src="{{ url_for('static', filename='profile.png') }}" alt="">
       </a>
-      <form action="/logout" method="POST">
+      <form action="/logout" method="POST" novalidate>
         <button class="btn btn-ghost" type="submit">Logout</button>
       </form>
     </nav>
@@ -58,7 +58,7 @@
   {% endif %}
 
   {% if error %}
-    <div class="alert" role="alert" style="margin-top: 16px">{{ error }}</div>
+    <div class="notice notice-error" role="alert">{{ error }}</div>
   {% endif %}
 
   <a class="btn btn-ghost" href="{{ url_for('search') }}" style="margin-top: 18px;">Return to Search</a>
