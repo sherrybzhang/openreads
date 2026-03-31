@@ -1,19 +1,24 @@
 # OpenReads
 
-OpenReads is a book review application that lets users create accounts, search for books, view book details, submit reviews, and view a personal profile. It also includes an API-backed route at `/api/books/<isbn>` using the Google Books API.
+OpenReads is a book review application where users can create accounts, search for books, view book details, submit reviews, and manage a personal profile. It also includes a Google Books API-backed route at `/api/books/<isbn>`.
 
 ***NOTE**: Originally built from scratch in 2023. In 2026, I used AI-assisted development tools to help refactor, modernize, and improve parts of the codebase, including backend fixes and a more polished UI. The architecture, product decisions, and final implementation choices remained mine.*
 
+### Current Version
 ![OpenReads Screenshot](docs/openreads-screenshot-mar25.png)
 
+### Original Version
+![Nittany Reads Screenshot](docs/nittanyreads-screenshot.png)
+
+The refreshed version introduces a redesigned interface, a new profile page, backend and architecture improvements, and accessibility and usability enhancements across the app.
+
 ## Features
-- User registration and sign in
-- Search by ISBN, title, or author
-- Book detail page with OpenReads ratings and reviewer details
-- Profile page with review summary and recent activity
-- One review per user per book
-- API route for book info
-- Improved accessibility and usability
+- Account creation and sign in
+- Book search by ISBN, title, or author
+- Book detail pages with ratings and reviews
+- User profile with review history and activity
+- One review allowed per user per book
+- Google Books API integration
 
 ## Technologies
 - **Languages:** Python, SQL, HTML, CSS
