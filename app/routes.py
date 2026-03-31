@@ -644,39 +644,26 @@ def api_info(isbn: str) -> ResponseReturnValue:
     Returns:
         Rendered HTML response with book data or error.
     """
-    # Check to see if ISBN exists in database
-    check_isbn = db.execute(
-        text("SELECT isbn FROM books WHERE isbn = :isbn"), {"isbn": isbn}
-    ).fetchone()
+    success = retrieve_book(isbn, BookQuery.JSON)
+    try:
+        book_data = json.loads(success) if success else None
+    except (TypeError, json.JSONDecodeError):
+        book_data = None
 
-    if check_isbn:
-        success = retrieve_book(isbn, BookQuery.JSON)
-        try:
-            book_data = json.loads(success) if success else None
-        except (TypeError, json.JSONDecodeError):
-            book_data = None
-
-        if book_data and book_data.get("error"):
-            return render_template(
-                "book-api.html",
-                page_title=f"OpenReads | API | {isbn}",
-                error=book_data["error"],
-            )
-        if book_data:
-            return render_template(
-                "book-api.html",
-                page_title=f"OpenReads | API | {isbn}",
-                book_data=book_data,
-            )
+    if book_data and book_data.get("error"):
         return render_template(
             "book-api.html",
             page_title=f"OpenReads | API | {isbn}",
-            error="Unable to fetch book details.",
+            error=book_data["error"],
         )
-    else:
-        error = "404 Error - The requested URL /api/books/" + isbn + " was not found on this server."
+    if book_data:
         return render_template(
             "book-api.html",
             page_title=f"OpenReads | API | {isbn}",
-            error=error,
-        ), 404
+            book_data=book_data,
+        )
+    return render_template(
+        "book-api.html",
+        page_title=f"OpenReads | API | {isbn}",
+        error="Unable to fetch book details.",
+    )
