@@ -45,3 +45,38 @@ def test_retrieve_book_valid_isbn_uses_api(monkeypatch: pytest.MonkeyPatch) -> N
     assert payload["title"] == "Example"
     assert payload["average_rating"] == 4.5
     assert payload["review_count"] == 12
+
+
+def test_retrieve_book_formats_multiple_authors(monkeypatch: pytest.MonkeyPatch) -> None:
+    def fake_get(url: str, params: dict[str, str], timeout: int) -> DummyResponse:
+        return DummyResponse(
+            200,
+            {
+                "items": [
+                    {
+                        "volumeInfo": {
+                            "title": "Head First Design Patterns",
+                            "authors": [
+                                "Eric Freeman",
+                                "Elisabeth Robson",
+                                "Elisabeth Freeman",
+                                "Kathy Sierra",
+                                "Bert Bates",
+                            ],
+                            "publishedDate": "2004-10-25",
+                            "averageRating": 4.7,
+                            "ratingsCount": 321,
+                        }
+                    }
+                ]
+            },
+        )
+
+    monkeypatch.setattr("app.services.google_books.requests.get", fake_get)
+    result = retrieve_book("9780596007126", BookQuery.JSON)
+    payload = json.loads(result)
+
+    assert (
+        payload["author"]
+        == "Eric Freeman, Elisabeth Robson, Elisabeth Freeman, Kathy Sierra, Bert Bates"
+    )

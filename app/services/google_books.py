@@ -93,7 +93,7 @@ def retrieve_book(isbn: str, query: BookQuery) -> Optional[object]:
 
     volume_info = items[0].get("volumeInfo", {})
     authors = volume_info.get("authors", [])
-    display_author = authors if len(authors) > 1 else (authors[0] if authors else "Unknown")
+    display_author = ", ".join(authors) if authors else "Unknown"
 
     rating_raw = volume_info.get("averageRating")
     rating = float(rating_raw) if rating_raw is not None else None
