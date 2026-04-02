@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block body %}
+{% set field_errors = field_errors|default({}) %}
 <header class="site-header">
   <a class="brand brand-link" href="{{ url_for('search') if current_user else url_for('index') }}">
     <div class="brand-mark" aria-hidden="true">OR</div>
