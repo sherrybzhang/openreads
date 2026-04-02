@@ -16,23 +16,10 @@ class _SessionLike(Protocol):
 
 
 def get_database_url() -> str:
-    """
-    Return the database URL from environment or a local default.
-
-    Returns:
-        The database connection URL.
-    """
     return os.environ.get("DATABASE_URL", "postgresql://localhost/sherryzhang")
 
 
 def log_error(error_log_path: str, message: str) -> None:
-    """
-    Append a single error message to the error log file.
-
-    Args:
-        error_log_path: Path to the error log file.
-        message: Error message to append.
-    """
     with open(error_log_path, "a", encoding="utf-8") as f:
         f.write(message + "")
 
@@ -40,18 +27,7 @@ def log_error(error_log_path: str, message: str) -> None:
 def insert_batch(
     db: _SessionLike, batch_params: list[dict[str, str]], batch_rows: list[int], error_log_path: str
 ) -> Tuple[int, int, int]:
-    """
-    Insert a batch of book rows; fall back to per-row inserts on batch failure.
-
-    Args:
-        db: SQLAlchemy session.
-        batch_params: List of row parameter dicts.
-        batch_rows: CSV row numbers matching batch_params.
-        error_log_path: Path to the error log file.
-
-    Returns:
-        A tuple of (inserted, skipped, errors).
-    """
+    """Insert a batch of books, falling back to row-by-row inserts on failure."""
     inserted = 0
     skipped = 0
     errors = 0
@@ -95,17 +71,7 @@ def insert_batch(
 def load_books(
     csv_path: str, batch_size: int = 500, error_log_path: Optional[str] = None
 ) -> Tuple[int, int, int]:
-    """
-    Load books from a CSV into the database with batching and error logging.
-
-    Args:
-        csv_path: Path to the CSV file.
-        batch_size: Number of rows per batch insert.
-        error_log_path: Optional path for error logs.
-
-    Returns:
-        A tuple of (inserted, skipped, errors).
-    """
+    """Load books from a CSV into the database in batches."""
     engine = create_engine(get_database_url())
     db = scoped_session(sessionmaker(bind=engine))
 
@@ -170,7 +136,6 @@ def load_books(
 
 
 def main() -> None:
-    """Entrypoint to load books from the default CSV path."""
     data_path = os.path.join(os.path.dirname(__file__), "..", "data", "books.csv")
     if not os.path.exists(data_path):
         raise FileNotFoundError(f"CSV file not found: {data_path}")

@@ -12,16 +12,10 @@ _logger = logging.getLogger(__name__)
 
 
 def _normalize_isbn(isbn: str) -> str:
-    """
-    Normalize ISBN by stripping spaces and hyphens.
-    """
     return isbn.replace("-", "").replace(" ", "")
 
 
 def _is_valid_isbn(isbn: str) -> bool:
-    """
-    Return True if ISBN looks like a 10 or 13 character ISBN.
-    """
     normalized = _normalize_isbn(isbn)
     if len(normalized) == 10:
         return normalized[:-1].isdigit() and (
@@ -49,23 +43,13 @@ def retrieve_book(isbn: str, query: Literal[BookQuery.AVERAGE_RATING]) -> Option
 def retrieve_book(isbn: str, query: Literal[BookQuery.NUMBER_OF_RATING]) -> int: ...
 
 def retrieve_book(isbn: str, query: BookQuery) -> Optional[object]:
-    """
-    Retrieve Google Books data for a given ISBN.
-
-    Args:
-        isbn: ISBN string to query.
-        query: The type of data to return.
-
-    Returns:
-        JSON string, rating value (float or None), rating count (int), or None if unavailable.
-    """
+    """Return Google Books data or a safe fallback for the requested query."""
     if not _is_valid_isbn(isbn):
         _logger.warning("Invalid ISBN provided: %s", isbn)
         return _fallback_response(isbn, query)
 
     url = "https://www.googleapis.com/books/v1/volumes?"
     try:
-        # Build request params and include API key if available
         normalized_isbn = _normalize_isbn(isbn)
         params = {"q": f"isbn:{normalized_isbn}"}
         api_key = os.environ.get("GOOGLE_BOOKS_API_KEY")
@@ -133,16 +117,7 @@ def _fallback_response(isbn: str, query: Literal[BookQuery.AVERAGE_RATING]) -> s
 def _fallback_response(isbn: str, query: Literal[BookQuery.NUMBER_OF_RATING]) -> str: ...
 
 def _fallback_response(isbn: str, query: BookQuery) -> Optional[object]:
-    """
-    Return a safe fallback response when API data is unavailable.
-
-    Args:
-        isbn: ISBN string used for context in the fallback payload.
-        query: The type of data requested.
-
-    Returns:
-        JSON string, rating value, rating count, or None when unsupported.
-    """
+    """Return a typed fallback value when Google Books data is unavailable."""
     if query == BookQuery.JSON:
         # Provide a minimal JSON payload on failure
         return json.dumps(

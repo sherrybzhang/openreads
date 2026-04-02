@@ -24,9 +24,6 @@ def _render_home_page(
     form_data: Optional[dict[str, str]] = None,
     field_errors: Optional[FieldErrors] = None,
 ) -> str:
-    """
-    Render the home page with optional form state.
-    """
     return render_template(
         "home.html",
         page_title="OpenReads | Create Account",
@@ -41,9 +38,6 @@ def _render_sign_in_page(
     form_data: Optional[dict[str, str]] = None,
     field_errors: Optional[FieldErrors] = None,
 ) -> str:
-    """
-    Render the sign-in page with optional form state.
-    """
     return render_template(
         "sign-in.html",
         page_title="OpenReads | Sign In",
@@ -60,9 +54,6 @@ def _render_search_page(
     form_data: Optional[dict[str, str]] = None,
     form_error: Optional[str] = None,
 ) -> str:
-    """
-    Render the search page with optional search results and form state.
-    """
     return render_template(
         "search.html",
         page_title="OpenReads | Search Books",
@@ -82,9 +73,6 @@ def _render_book_detail_page(
     review_message: Optional[str] = None,
     field_errors: Optional[FieldErrors] = None,
 ) -> str:
-    """
-    Render the book detail page with optional review form state.
-    """
     return render_template(
         "book-detail.html",
         page_title=f"OpenReads | {context['title']}",
@@ -99,39 +87,18 @@ def _render_book_detail_page(
 
 @app.route("/")
 def index() -> str:
-    """
-    Render the home page.
-
-    Returns:
-        Rendered HTML response for the index page.
-    """
     return _render_home_page()
 
 
 def _set_session(user_id: int) -> None:
-    """
-    Persist the logged-in user id in the session.
-
-    Args:
-        user_id: The authenticated user's id.
-    """
     session["id"] = user_id
 
 
 def _get_session() -> Optional[int]:
-    """
-    Retrieve the logged-in user id from the session.
-
-    Returns:
-        The user id if present; otherwise None.
-    """
     return session.get("id")
 
 
 def _build_initials(username: Optional[str]) -> str:
-    """
-    Build a short initials string from the username.
-    """
     if not username:
         return "U"
     
@@ -148,12 +115,7 @@ def _build_initials(username: Optional[str]) -> str:
 
 
 def _load_current_user() -> Optional[CurrentUser]:
-    """
-    Load the current user for the active session.
-
-    Returns:
-        A dict with user data, or None if not authenticated.
-    """
+    """Return current user data for the active session, if any."""
     if hasattr(g, "current_user"):
         # Avoid repeated DB lookups in the same request
         return g.current_user
@@ -185,22 +147,11 @@ def _load_current_user() -> Optional[CurrentUser]:
 
 @app.context_processor
 def _inject_current_user() -> dict[str, Optional[CurrentUser]]:
-    """
-    Expose the current user to templates.
-    """
     return {"current_user": _load_current_user()}
 
 
 def _build_book_context(isbn: str) -> Optional[BookContext]:
-    """
-    Build the template context for a book detail page.
-
-    Args:
-        isbn: The ISBN string to query.
-
-    Returns:
-        A dict of book context values, or None if the book is not found.
-    """
+    """Return book detail template data for an ISBN, or `None` if missing."""
     book_row = db.execute(
         text("SELECT title, author, year FROM books WHERE isbn = :isbn"),
         {"isbn": isbn},
@@ -242,20 +193,11 @@ def _build_book_context(isbn: str) -> Optional[BookContext]:
 
 @app.route("/register", methods=["POST"])
 def register() -> ResponseReturnValue:
-    """
-    Handle user registration.
-    
-    Reads `username` and `password` from POST form data.
-    
-    Returns:
-        Redirects to sign-in on success or re-renders the index with an error.
-    """
     if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"]
         form_data = {"username": username}
 
-        # User did not provide a username and/or password
         field_errors: FieldErrors = {}
         if username == "":
             field_errors["username"] = "Please enter a username."
@@ -267,7 +209,6 @@ def register() -> ResponseReturnValue:
                 field_errors=field_errors,
             )
 
-        # Username already exists in database
         user_db = db.execute(
             text("SELECT * FROM users WHERE username = :username"),
             {"username": username},
@@ -282,7 +223,6 @@ def register() -> ResponseReturnValue:
                 },
             )
 
-        # Creating new account for the user
         password_hash = generate_password_hash(password)
         db.execute(
             text(
@@ -297,31 +237,16 @@ def register() -> ResponseReturnValue:
 
 @app.route("/sign-in", methods=["GET"])
 def sign_in() -> str:
-    """
-    Render the sign-in page.
-
-    Returns:
-        Rendered HTML response for the sign-in page.
-    """
     return _render_sign_in_page()
 
 
 @app.route("/sign-in", methods=["POST"])
 def login() -> ResponseReturnValue:
-    """
-    Authenticate a user and start a session.
-
-    Reads `username` and `password` from POST form data.
-
-    Returns:
-        Redirects to search on success or re-renders sign-in with an error.
-    """
     if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"]
         form_data = {"username": username}
 
-        # Username and/or password is missing
         field_errors = {}
         if username == "":
             field_errors["username"] = "Please enter your username."
@@ -333,7 +258,6 @@ def login() -> ResponseReturnValue:
                 field_errors=field_errors,
             )
 
-        # Checks if username exists, then validates password hash
         user_info = db.execute(
             text("SELECT id, password FROM users WHERE username = :username"),
             {"username": username},
@@ -350,12 +274,6 @@ def login() -> ResponseReturnValue:
 
 @app.route("/logout", methods=["POST"])
 def logout() -> ResponseReturnValue:
-    """
-    Log out the current user.
-
-    Returns:
-        Redirects to the home page.
-    """
     if request.method == "POST":
         session.pop("id", None)  # Ends user session
         return redirect(url_for("index"))
@@ -363,12 +281,6 @@ def logout() -> ResponseReturnValue:
 
 @app.route("/profile")
 def profile() -> str:
-    """
-    Render the user profile page.
-
-    Returns:
-        Rendered HTML response for the profile page.
-    """
     current_user = _load_current_user()
     if current_user is None:
         # Redirect unauthenticated users back to sign-in
@@ -429,21 +341,12 @@ def profile() -> str:
 
 @app.route("/search", methods=["GET", "POST"])
 def search() -> str:
-    """
-    Search for books by ISBN, title, or author.
-
-    Reads `isbn`, `title`, and `author` from form data.
-
-    Returns:
-        Rendered search results or a validation message.
-    """
     if request.method == "POST":
         isbn = request.form["isbn"].strip()
         title = request.form["title"].strip()
         author = request.form["author"].strip()
         form_data = {"isbn": isbn, "title": title, "author": author}
 
-        # Search by ISBN
         if isbn and title == "" and author == "":
             books = db.execute(
                 text("SELECT * FROM books WHERE isbn ILIKE :isbn"),
@@ -457,7 +360,6 @@ def search() -> str:
                     form_data=form_data,
                 )
 
-        # Search by book title
         elif title and isbn == "" and author == "":
             books = db.execute(
                 text("SELECT * FROM books WHERE title ILIKE :title"),
@@ -471,7 +373,6 @@ def search() -> str:
                     form_data=form_data,
                 )
 
-        # Search by author
         elif author and isbn == "" and title == "":
             books = db.execute(
                 text("SELECT * FROM books WHERE author ILIKE :author"),
@@ -502,26 +403,11 @@ def search() -> str:
 
 @app.route("/return-to-search", methods=["GET", "POST"])
 def return_to_search() -> str:
-    """
-    Return the user to the search page.
-
-    Returns:
-        Rendered HTML response for the search page.
-    """
     return _render_search_page()
 
 
-# Extracts information on the user's desired book and outputs it on book page
 @app.route("/book", methods=["POST"])
 def view() -> str:
-    """
-    Render the book detail page for a selected book.
-
-    Reads `book` (ISBN) from POST form data.
-
-    Returns:
-        Rendered book detail page or a validation error.
-    """
     # User hits 'View Book' button before completing a search
     try:
         isbn = request.form["book"]
@@ -540,14 +426,6 @@ def view() -> str:
 
 @app.route("/review", methods=["POST"])
 def review() -> ResponseReturnValue:
-    """
-    Submit a review for a book.
-
-    Reads `isbn`, `rating`, and `review` from POST form data.
-
-    Returns:
-        Rendered book page with errors, or a redirect on success.
-    """
     if request.method == "POST":
         user_id = _get_session()
         if user_id is None:
@@ -615,14 +493,6 @@ def review() -> ResponseReturnValue:
 
 @app.route("/status")
 def message() -> str:
-    """
-    Render a status message page.
-
-    Reads `success` and `error` from query parameters.
-
-    Returns:
-        Rendered HTML response for the message page.
-    """
     success = request.args.get("success")
     error = request.args.get("error")
     return render_template(
@@ -635,15 +505,6 @@ def message() -> str:
 
 @app.route("/api/books/<isbn>")
 def api_info(isbn: str) -> ResponseReturnValue:
-    """
-    Render a page with book info from the Google Books API.
-
-    Args:
-        isbn: The ISBN string provided in the URL.
-
-    Returns:
-        Rendered HTML response with book data or error.
-    """
     success = retrieve_book(isbn, BookQuery.JSON)
     try:
         book_data = json.loads(success) if success else None
